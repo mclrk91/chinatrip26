@@ -56,11 +56,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-cream">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-brand-bg">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="text-4xl mb-2">&#9992;&#65039;</div>
-          <CardTitle className="text-2xl">Trip Command Center</CardTitle>
+          <CardTitle className="text-2xl font-serif">Trip Command Center</CardTitle>
           <p className="text-muted-foreground text-base mt-2">
             Enter your 4-digit PIN to continue
           </p>
@@ -73,8 +73,8 @@ export default function LoginPage() {
                 key={i}
                 className="w-14 h-14 rounded-lg border-2 flex items-center justify-center text-2xl font-bold"
                 style={{
-                  borderColor: pin.length > i ? "#C41E3A" : "#d4cfc9",
-                  backgroundColor: pin.length > i ? "#fef2f2" : "white",
+                  borderColor: pin.length > i ? "#8B2131" : "#E8DED1",
+                  backgroundColor: pin.length > i ? "#F5E1E4" : "#FFFDFC",
                 }}
               >
                 {pin[i] ? "\u2022" : ""}
@@ -123,7 +123,7 @@ export default function LoginPage() {
 
           {loading && (
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-china-red" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-red" />
             </div>
           )}
         </CardContent>

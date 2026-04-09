@@ -34,7 +34,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Settings</h1>
+      <h1 className="text-2xl font-serif font-bold mb-6 text-brand-text">Settings</h1>
 
       <div className="space-y-4">
         <Card>

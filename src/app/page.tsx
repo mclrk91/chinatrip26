@@ -127,12 +127,12 @@ export default function HomePage() {
   return (
     <div className="min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
-        <h1 className="text-xl font-bold">
-          <span className="text-china-red">Thailand & China</span>{" "}
-          <span className="text-muted-foreground font-normal">Oct 2026</span>
+      <header className="sticky top-0 z-20 bg-brand-bg/95 backdrop-blur-sm border-b border-brand-border px-4 py-3">
+        <h1 className="text-xl font-serif font-bold">
+          <span className="text-brand-red">Thailand & China</span>{" "}
+          <span className="text-brand-muted font-normal">Oct 2026</span>
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-brand-muted">
           {bookings.filter((b) => b.status === "confirmed").length} confirmed bookings
         </p>
       </header>
@@ -141,16 +141,16 @@ export default function HomePage() {
       <main className="px-4 pt-4 max-w-2xl mx-auto">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red" />
-            <p className="mt-4 text-muted-foreground">Loading your itinerary...</p>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-red" />
+            <p className="mt-4 text-brand-muted">Loading your itinerary...</p>
           </div>
         ) : error ? (
           <div className="text-center py-20">
             <p className="text-xl font-semibold mb-2 text-red-600">Something went wrong</p>
-            <p className="text-muted-foreground mb-4">{error}</p>
+            <p className="text-brand-muted mb-4">{error}</p>
             <button
               onClick={() => { setLoading(true); fetchBookings(); }}
-              className="text-china-red underline text-lg"
+              className="text-brand-red underline text-lg"
             >
               Try again
             </button>
@@ -158,10 +158,10 @@ export default function HomePage() {
         ) : bookings.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-xl font-semibold mb-2">No bookings yet</p>
-            <p className="text-muted-foreground mb-2">
+            <p className="text-brand-muted mb-2">
               Tap &ldquo;Add Booking&rdquo; below to get started
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-brand-muted">
               Or go to Settings and tap &ldquo;Reload Sample Bookings&rdquo;
             </p>
           </div>

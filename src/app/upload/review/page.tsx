@@ -52,14 +52,14 @@ export default function ReviewPage() {
   if (!extractedData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-red" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-2">Review Booking Details</h1>
+      <h1 className="text-2xl font-serif font-bold mb-2 text-brand-text">Review Booking Details</h1>
       <p className="text-muted-foreground mb-6">
         We extracted these details from your file. Please check everything looks
         right and make any corrections before saving.

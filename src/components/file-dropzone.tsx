@@ -39,25 +39,25 @@ export function FileDropzone({ onFileAccepted, isUploading }: FileDropzoneProps)
       {...getRootProps()}
       className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors min-h-[200px] flex flex-col items-center justify-center ${
         isDragActive
-          ? "border-china-red bg-red-50"
+          ? "border-brand-red bg-brand-lightred"
           : isUploading
-          ? "border-gray-300 bg-gray-50 cursor-not-allowed"
-          : "border-gray-300 hover:border-china-red hover:bg-red-50/30"
+          ? "border-brand-border bg-brand-cardbg cursor-not-allowed"
+          : "border-brand-border hover:border-brand-red hover:bg-brand-lightred/30"
       }`}
     >
       <input {...getInputProps()} />
 
       {isUploading ? (
         <div className="space-y-3">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-red mx-auto" />
           <p className="text-lg text-muted-foreground">Processing your file...</p>
         </div>
       ) : file ? (
         <div className="space-y-3">
           {file.type.startsWith("image/") ? (
-            <ImageIcon className="h-10 w-10 text-china-red mx-auto" />
+            <ImageIcon className="h-10 w-10 text-brand-red mx-auto" />
           ) : (
-            <FileText className="h-10 w-10 text-china-red mx-auto" />
+            <FileText className="h-10 w-10 text-brand-red mx-auto" />
           )}
           <p className="text-lg font-medium">{file.name}</p>
           <p className="text-muted-foreground">

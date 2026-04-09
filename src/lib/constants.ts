@@ -7,7 +7,7 @@ export const BOOKING_STATUSES = ["confirmed", "cancelled", "pending", "modified"
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 
 export const BOOKING_TYPE_COLORS: Record<BookingType, string> = {
-  flight: "#C41E3A",
+  flight: "#8B2131",
   hotel: "#D4AF37",
   tour: "#1B4D3E",
   activity: "#1B4D3E",

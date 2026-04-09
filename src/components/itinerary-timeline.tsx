@@ -49,18 +49,23 @@ export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelin
       {days.map((day) => (
         <div key={day.dateStr}>
           {/* Day Header */}
-          <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-sm pb-2 pt-2">
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-china-red">
-                Day {day.dayNumber}
-              </span>
-              <span className="text-lg font-semibold">
-                {format(day.date, "EEE, MMM d")}
-              </span>
+          <div className="sticky top-0 z-10 bg-brand-bg/95 backdrop-blur-sm pb-2 pt-2">
+            <div className="flex items-stretch">
+              <div className="w-2 bg-brand-red rounded-l-md mr-3 self-stretch" />
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-serif font-bold text-brand-text">
+                    Day {day.dayNumber}
+                  </span>
+                  <span className="text-lg font-semibold text-brand-text">
+                    {format(day.date, "EEE, MMM d")}
+                  </span>
+                </div>
+                {day.city && (
+                  <p className="text-sm text-brand-muted">{day.city}</p>
+                )}
+              </div>
             </div>
-            {day.city && (
-              <p className="text-sm text-muted-foreground">{day.city}</p>
-            )}
           </div>
 
           {/* Bookings for this day */}
