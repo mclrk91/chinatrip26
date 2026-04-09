@@ -30,6 +30,43 @@ export const TRIP_START = new Date("2026-10-05T00:00:00");
 export const TRIP_END = new Date("2026-10-24T23:59:59");
 export const TRIP_DAYS = 20; // Oct 5-24 inclusive
 
+// Default provider website URLs for booking hyperlinks
+export const PROVIDER_URLS: Record<string, string> = {
+  delta: "https://www.delta.com",
+  egyptair: "https://www.egyptair.com",
+  "hainan airlines": "https://www.hainanairlines.com",
+  "bangkok airways": "https://www.bangkokair.com",
+  "qatar airways": "https://www.qatarairways.com",
+  "american airlines": "https://www.aa.com",
+  "air canada": "https://www.aircanada.com",
+  conrad: "https://www.hilton.com",
+  hilton: "https://www.hilton.com",
+  westin: "https://www.marriott.com",
+  marriott: "https://www.marriott.com",
+  raweekanlaya: "https://www.chailaiorchid.com",
+  "chai lai orchid": "https://www.chailaiorchid.com",
+};
+
+export function getProviderUrl(provider: string | null, bookingUrl: string | null): { url: string; label: string } | null {
+  if (bookingUrl) {
+    try {
+      const hostname = new URL(bookingUrl).hostname.replace("www.", "");
+      return { url: bookingUrl, label: hostname };
+    } catch {
+      return { url: bookingUrl, label: "Booking Site" };
+    }
+  }
+  if (!provider) return null;
+  const key = provider.toLowerCase();
+  for (const [name, url] of Object.entries(PROVIDER_URLS)) {
+    if (key.includes(name) || name.includes(key)) {
+      const hostname = new URL(url).hostname.replace("www.", "");
+      return { url, label: hostname };
+    }
+  }
+  return null;
+}
+
 export const CITIES_BY_DATE: Record<string, string> = {
   "2026-10-05": "Tampa → New York",
   "2026-10-06": "In Transit (Cairo)",

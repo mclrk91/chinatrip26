@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS } from "@/lib/constants";
+import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS, getProviderUrl } from "@/lib/constants";
 import type { Booking } from "@/lib/supabase/types";
 
 interface BookingDetailProps {
@@ -47,28 +47,47 @@ export function BookingDetail({
   const details = booking.details as Record<string, string>;
   const cost = booking.cost as Record<string, unknown>;
   const isCancelled = booking.status === "cancelled";
+  const providerLink = getProviderUrl(booking.provider, booking.booking_url);
+
+  // Flight duration
+  const flightDuration = (() => {
+    if (booking.type !== "flight" || !booking.date_start || !booking.date_end) return null;
+    const ms = new Date(booking.date_end).getTime() - new Date(booking.date_start).getTime();
+    if (ms <= 0) return null;
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const mins = Math.round((ms % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours === 0) return `${mins}m`;
+    if (mins === 0) return `${hours}h`;
+    return `${hours}h ${mins}m`;
+  })();
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent side="bottom">
         <SheetHeader>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Badge
               className="text-sm"
               style={{ backgroundColor: color, color: "white" }}
             >
               {BOOKING_TYPE_LABELS[booking.type]}
             </Badge>
-            <Badge
-              variant="outline"
-              className={`text-sm ${
-                isCancelled ? "text-muted-foreground" : booking.status === "pending" ? "text-coral border-coral" : "text-jade border-jade"
-              }`}
-            >
-              {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-            </Badge>
+            {isCancelled ? (
+              <Badge className="text-sm bg-red-600 text-white">
+                CANCELLED
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className={`text-sm ${
+                  booking.status === "pending" ? "text-coral border-coral" : "text-jade border-jade"
+                }`}
+              >
+                {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+              </Badge>
+            )}
           </div>
-          <SheetTitle className={`text-xl ${isCancelled ? "line-through" : ""}`}>
+          <SheetTitle className={`text-xl ${isCancelled ? "line-through text-muted-foreground" : ""}`}>
             {booking.title}
           </SheetTitle>
           <SheetDescription>
@@ -76,6 +95,25 @@ export function BookingDetail({
             {booking.confirmation_code && `Confirmation: ${booking.confirmation_code}`}
           </SheetDescription>
         </SheetHeader>
+
+        {/* Provider Website Link — prominently placed right after header */}
+        {providerLink && (
+          <a
+            href={providerLink.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 mt-3 py-2.5 px-4 rounded-lg bg-china-red/10 text-china-red font-medium text-base hover:bg-china-red/20 transition-colors"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Manage on {providerLink.label}
+          </a>
+        )}
+
+        {isCancelled && (
+          <p className="text-sm text-muted-foreground italic mt-3 p-3 bg-red-50 rounded-lg border border-red-100">
+            This booking is cancelled. Tap details below to see cancellation policy.
+          </p>
+        )}
 
         <dl className="mt-4 space-y-0">
           {booking.date_start && (
@@ -112,6 +150,9 @@ export function BookingDetail({
               value={`${details.departure_airport} → ${details.arrival_airport}`}
             />
           )}
+          {flightDuration && (
+            <DetailRow label="Flight Duration" value={flightDuration} />
+          )}
           {details?.seats && <DetailRow label="Seats" value={details.seats} />}
           {details?.city && <DetailRow label="City" value={details.city} />}
           {details?.room_type && <DetailRow label="Room Type" value={details.room_type} />}
@@ -127,18 +168,6 @@ export function BookingDetail({
           <DetailRow label="Cancellation Policy" value={booking.cancellation_policy} />
           <DetailRow label="Notes" value={booking.notes} />
         </dl>
-
-        {booking.booking_url && (
-          <a
-            href={booking.booking_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-china-red mt-4 text-base font-medium"
-          >
-            <ExternalLink className="h-4 w-4" />
-            View on Booking Site
-          </a>
-        )}
 
         {/* Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t">

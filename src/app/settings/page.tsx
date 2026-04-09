@@ -79,7 +79,6 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="text-base text-muted-foreground">
             <p>Trip Command Center v1.0</p>
-            <p>Built with Next.js, Supabase, and Claude AI</p>
           </CardContent>
         </Card>
       </div>

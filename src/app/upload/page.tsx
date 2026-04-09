@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileDropzone } from "@/components/file-dropzone";
@@ -68,7 +69,15 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Add a Booking</h1>
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          onClick={() => router.push("/")}
+          className="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-muted transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <h1 className="text-2xl font-bold">Add a Booking</h1>
+      </div>
 
       <Tabs defaultValue="upload" className="w-full">
         <TabsList className="w-full">
