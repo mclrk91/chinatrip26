@@ -1,16 +1,20 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Search, Sparkles } from "lucide-react";
 import { ItineraryTimeline } from "@/components/itinerary-timeline";
 import { BookingDetail } from "@/components/booking-detail";
 import { EditBookingDialog } from "@/components/edit-booking-dialog";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
+import { ShowDriverModal } from "@/components/show-driver-modal";
 import { BottomNav } from "@/components/bottom-nav";
 import type { Booking } from "@/lib/supabase/types";
 import type { BookingFormData } from "@/components/booking-form";
 
 export default function HomePage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +26,8 @@ export default function HomePage() {
   const [deleteBooking, setDeleteBooking] = useState<Booking | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [driverBooking, setDriverBooking] = useState<Booking | null>(null);
+  const [driverOpen, setDriverOpen] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     try {
@@ -124,17 +130,44 @@ export default function HomePage() {
     }
   };
 
+  const handleShowDriver = (booking: Booking) => {
+    setDetailOpen(false);
+    setDriverBooking(booking);
+    setDriverOpen(true);
+  };
+
   return (
     <div className="min-h-screen pb-24">
-      {/* Header */}
+      {/* Header with Search */}
       <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
-        <h1 className="text-xl font-bold">
-          <span className="text-china-red">Thailand & China</span>{" "}
-          <span className="text-muted-foreground font-normal">Oct 2026</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {bookings.filter((b) => b.status === "confirmed").length} confirmed bookings
-        </p>
+        {/* Search bar - first element */}
+        <div
+          className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 mb-3 cursor-pointer hover:border-gray-300 transition-colors"
+          onClick={() => router.push("/search")}
+        >
+          <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <span className="text-muted-foreground text-base">Search bookings...</span>
+        </div>
+
+        {/* Title row + Ask AI button */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold">
+              <span className="text-china-red">Thailand & China</span>{" "}
+              <span className="text-muted-foreground font-normal">Oct 2026</span>
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Oct 5 – 24, 2026
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/search?mode=ai")}
+            className="flex items-center gap-1.5 px-3 py-2 bg-china-red/10 text-china-red rounded-lg text-sm font-medium hover:bg-china-red/20 transition-colors"
+          >
+            <Sparkles className="h-4 w-4" />
+            Ask AI
+          </button>
+        </div>
       </header>
 
       {/* Content */}
@@ -159,7 +192,7 @@ export default function HomePage() {
           <div className="text-center py-20">
             <p className="text-xl font-semibold mb-2">No bookings yet</p>
             <p className="text-muted-foreground mb-2">
-              Tap &ldquo;Add Booking&rdquo; below to get started
+              Tap &ldquo;Upload&rdquo; below to get started
             </p>
             <p className="text-sm text-muted-foreground">
               Or go to Settings and tap &ldquo;Reload Sample Bookings&rdquo;
@@ -184,6 +217,17 @@ export default function HomePage() {
         onEdit={handleEdit}
         onCancel={handleCancel}
         onDelete={handleDeleteClick}
+        onShowDriver={handleShowDriver}
+      />
+
+      {/* Show to Driver Modal */}
+      <ShowDriverModal
+        booking={driverBooking}
+        open={driverOpen}
+        onClose={() => {
+          setDriverOpen(false);
+          setDriverBooking(null);
+        }}
       />
 
       {/* Edit Dialog */}

@@ -1,10 +1,11 @@
 "use client";
 
-import { format } from "date-fns";
 import { Plane, Building2, MapPin, Bus, Utensils, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS } from "@/lib/constants";
+import { formatDualTime } from "@/lib/timezone";
+import { getAirlineLogo, getHotelLogo } from "@/lib/logos";
 import type { Booking } from "@/lib/supabase/types";
 
 const TYPE_ICONS: Record<string, React.ElementType> = {
@@ -28,9 +29,22 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
   const Icon = TYPE_ICONS[booking.type] || HelpCircle;
   const details = booking.details as Record<string, string>;
 
-  const timeStr = booking.date_start
-    ? format(new Date(booking.date_start), "h:mm a")
-    : "";
+  // Determine logo
+  let logoUrl: string | null = null;
+  if (booking.type === "flight") {
+    logoUrl = getAirlineLogo(booking.provider);
+  } else if (booking.type === "hotel") {
+    logoUrl = getHotelLogo(booking.title, booking.provider);
+  }
+
+  // Dual time display
+  const timeDisplay = booking.date_start
+    ? formatDualTime(
+        booking.date_start,
+        details?.departure_airport || details?.arrival_airport,
+        details?.city
+      )
+    : null;
 
   const subtitle = (() => {
     if (booking.type === "flight" && details?.departure_airport && details?.arrival_airport) {
@@ -51,12 +65,29 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
       style={{ borderLeft: `4px solid ${color}` }}
     >
       <div className="p-4 flex items-start gap-3">
-        <div
-          className="rounded-full p-2 flex-shrink-0 mt-0.5"
-          style={{ backgroundColor: `${color}15` }}
-        >
-          <Icon className="h-5 w-5" style={{ color }} />
-        </div>
+        {/* Logo or icon */}
+        {logoUrl ? (
+          <div className="flex-shrink-0 mt-0.5 rounded-lg overflow-hidden bg-white border border-gray-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logoUrl}
+              alt={booking.provider || booking.title}
+              className="w-10 h-10 object-contain"
+              onError={(e) => {
+                // Fallback to icon on error
+                (e.target as HTMLImageElement).style.display = "none";
+                (e.target as HTMLImageElement).parentElement!.classList.add("hidden");
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            className="rounded-full p-2 flex-shrink-0 mt-0.5"
+            style={{ backgroundColor: `${color}15` }}
+          >
+            <Icon className="h-5 w-5" style={{ color }} />
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -92,10 +123,19 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
             </p>
           )}
 
-          <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
-            {timeStr && <span>{timeStr}</span>}
+          <div className="flex items-center gap-3 mt-2 text-sm">
+            {timeDisplay && (
+              <span className="text-foreground">
+                <span className="font-medium">{timeDisplay.localTime}</span>
+                {timeDisplay.localLabel && (
+                  <span className="text-muted-foreground ml-1">{timeDisplay.localLabel}</span>
+                )}
+                <span className="text-muted-foreground mx-1.5">·</span>
+                <span className="text-muted-foreground text-xs">{timeDisplay.etTime} ET</span>
+              </span>
+            )}
             {booking.confirmation_code && (
-              <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded">
+              <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded text-muted-foreground">
                 {booking.confirmation_code}
               </span>
             )}
