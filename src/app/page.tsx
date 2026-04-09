@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { ItineraryTimeline } from "@/components/itinerary-timeline";
 import { BookingDetail } from "@/components/booking-detail";
 import { EditBookingDialog } from "@/components/edit-booking-dialog";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 import { BottomNav } from "@/components/bottom-nav";
+import { ChatPanel } from "@/components/chat-panel";
+import { InsightsPanel } from "@/components/insights-panel";
 import type { Booking } from "@/lib/supabase/types";
 import type { BookingFormData } from "@/components/booking-form";
 
@@ -22,6 +24,7 @@ export default function HomePage() {
   const [deleteBooking, setDeleteBooking] = useState<Booking | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   const fetchBookings = useCallback(async () => {
     try {
@@ -124,6 +127,16 @@ export default function HomePage() {
     }
   };
 
+  const handleInsightClick = (dates: string[]) => {
+    if (!dates.length || !timelineRef.current) return;
+    // Find the first matching date element and scroll to it
+    const targetDate = dates[0];
+    const dateEl = timelineRef.current.querySelector(`[data-date="${targetDate}"]`);
+    if (dateEl) {
+      dateEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div className="min-h-screen pb-24">
       {/* Header */}
@@ -138,7 +151,7 @@ export default function HomePage() {
       </header>
 
       {/* Content */}
-      <main className="px-4 pt-4 max-w-2xl mx-auto">
+      <main className="px-4 pt-4 max-w-2xl mx-auto" ref={timelineRef}>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red" />
@@ -166,15 +179,24 @@ export default function HomePage() {
             </p>
           </div>
         ) : (
-          <ItineraryTimeline
-            bookings={bookings}
-            onBookingClick={handleBookingClick}
-          />
+          <>
+            {/* AI Insights Panel */}
+            <InsightsPanel onInsightClick={handleInsightClick} />
+
+            {/* Itinerary Timeline */}
+            <ItineraryTimeline
+              bookings={bookings}
+              onBookingClick={handleBookingClick}
+            />
+          </>
         )}
       </main>
 
       {/* Bottom Navigation */}
       <BottomNav />
+
+      {/* Chat Panel */}
+      <ChatPanel bookings={bookings} onBookingsChanged={fetchBookings} />
 
       {/* Booking Detail Sheet */}
       <BookingDetail
