@@ -13,6 +13,7 @@ import type { BookingFormData } from "@/components/booking-form";
 export default function HomePage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [editBooking, setEditBooking] = useState<Booking | null>(null);
@@ -24,13 +25,16 @@ export default function HomePage() {
 
   const fetchBookings = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch("/api/bookings");
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
         setBookings(data);
+      } else {
+        setError(data.error || `API returned ${res.status}`);
       }
     } catch (err) {
-      console.error("Failed to fetch bookings:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch bookings");
     } finally {
       setLoading(false);
     }
@@ -140,11 +144,25 @@ export default function HomePage() {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red" />
             <p className="mt-4 text-muted-foreground">Loading your itinerary...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-xl font-semibold mb-2 text-red-600">Something went wrong</p>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <button
+              onClick={() => { setLoading(true); fetchBookings(); }}
+              className="text-china-red underline text-lg"
+            >
+              Try again
+            </button>
+          </div>
         ) : bookings.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-xl font-semibold mb-2">No bookings yet</p>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-2">
               Tap &ldquo;Add Booking&rdquo; below to get started
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Or go to Settings and tap &ldquo;Reload Sample Bookings&rdquo;
             </p>
           </div>
         ) : (

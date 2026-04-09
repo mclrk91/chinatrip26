@@ -8,19 +8,25 @@ import { BottomNav } from "@/components/bottom-nav";
 
 export default function SettingsPage() {
   const [seeding, setSeeding] = useState(false);
+  const [seedResult, setSeedResult] = useState<string | null>(null);
 
   const handleSeed = async () => {
     setSeeding(true);
+    setSeedResult(null);
     try {
       const res = await fetch("/api/seed", { method: "POST" });
       const data = await res.json();
       if (res.ok) {
         toast.success(data.message);
+        setSeedResult(`Success: ${data.message}`);
       } else {
         toast.error(data.error || "Seed failed");
+        setSeedResult(`Error: ${data.error || `Status ${res.status}`}`);
       }
-    } catch {
-      toast.error("Failed to seed database");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to seed database";
+      toast.error(msg);
+      setSeedResult(`Error: ${msg}`);
     } finally {
       setSeeding(false);
     }
@@ -59,6 +65,11 @@ export default function SettingsPage() {
             <p className="text-sm text-muted-foreground mt-2">
               This will reset the database with the original flight and hotel bookings.
             </p>
+            {seedResult && (
+              <p className={`text-sm mt-2 ${seedResult.startsWith("Success") ? "text-jade" : "text-red-600"}`}>
+                {seedResult}
+              </p>
+            )}
           </CardContent>
         </Card>
 
