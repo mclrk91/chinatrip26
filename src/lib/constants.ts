@@ -1,4 +1,11 @@
-export const TRAVELERS = ["Mike Clark", "Tonya Clark", "David P", "Amanda Ford"] as const;
+export const TRAVELERS = ["Mike Clark", "Tonya Clark", "David Ramos", "Amanda Ford"] as const;
+
+export const TRAVELER_COLORS: Record<string, string> = {
+  "Mike Clark": "#3B82F6",
+  "Tonya Clark": "#8B5CF6",
+  "David Ramos": "#10B981",
+  "Amanda Ford": "#F97316",
+};
 
 export const BOOKING_TYPES = ["flight", "hotel", "tour", "activity", "transport", "restaurant", "other"] as const;
 export type BookingType = (typeof BOOKING_TYPES)[number];

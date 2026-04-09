@@ -2,6 +2,7 @@
 
 import { format } from "date-fns";
 import { Plane, Building2, MapPin, Bus, Utensils, HelpCircle } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS } from "@/lib/constants";
@@ -72,8 +73,8 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
               </Badge>
             )}
             {isCancelled && (
-              <Badge variant="outline" className="text-xs px-2 py-0.5 text-muted-foreground">
-                Cancelled
+              <Badge variant="outline" className="text-xs px-2 py-0.5 text-red-600 border-red-600 font-semibold">
+                CANCELLED
               </Badge>
             )}
           </div>
@@ -95,9 +96,18 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
           <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
             {timeStr && <span>{timeStr}</span>}
             {booking.confirmation_code && (
-              <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(booking.confirmation_code!);
+                  toast.success("Confirmation code copied!");
+                }}
+                className="font-mono text-xs bg-muted px-2 py-0.5 rounded hover:bg-gray-200 active:scale-95 transition-all cursor-pointer"
+                title="Tap to copy"
+              >
                 {booking.confirmation_code}
-              </span>
+              </button>
             )}
           </div>
 
