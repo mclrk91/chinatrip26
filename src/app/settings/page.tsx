@@ -1,14 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BottomNav } from "@/components/bottom-nav";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [seeding, setSeeding] = useState(false);
   const [seedResult, setSeedResult] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    } catch {
+      toast.error("Failed to log out. Please try again.");
+    }
+  };
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -80,6 +93,19 @@ export default function SettingsPage() {
           <CardContent className="text-base text-muted-foreground">
             <p>Trip Command Center v1.0</p>
             <p>Built with Next.js, Supabase, and Claude AI</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full text-coral border-coral hover:bg-coral hover:text-white"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Log Out
+            </Button>
           </CardContent>
         </Card>
       </div>

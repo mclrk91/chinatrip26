@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { format, addDays, isSameDay, parseISO } from "date-fns";
 import { BookingCard } from "./booking-card";
-import { CITIES_BY_DATE } from "@/lib/constants";
+import { CITIES_BY_DATE, TRIP_START, TRIP_DAYS } from "@/lib/constants";
 import type { Booking } from "@/lib/supabase/types";
 
 interface ItineraryTimelineProps {
@@ -12,13 +12,10 @@ interface ItineraryTimelineProps {
 }
 
 export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelineProps) {
-  const tripStart = new Date("2026-10-05T00:00:00");
-  const tripDays = 20;
-
   const days = useMemo(() => {
     const result = [];
-    for (let i = 0; i < tripDays; i++) {
-      const date = addDays(tripStart, i);
+    for (let i = 0; i < TRIP_DAYS; i++) {
+      const date = addDays(TRIP_START, i);
       const dateStr = format(date, "yyyy-MM-dd");
       const dayBookings = bookings.filter((b) => {
         if (!b.date_start) return false;
@@ -49,7 +46,7 @@ export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelin
       {days.map((day) => (
         <div key={day.dateStr}>
           {/* Day Header */}
-          <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-sm pb-2 pt-2">
+          <div className="sticky top-[73px] z-10 bg-cream/95 backdrop-blur-sm pb-2 pt-2">
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-bold text-china-red">
                 Day {day.dayNumber}

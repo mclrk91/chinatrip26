@@ -5,30 +5,36 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileDropzone } from "@/components/file-dropzone";
+import { FileDropzone, type ExtractionStep } from "@/components/file-dropzone";
 import { BookingForm, type BookingFormData } from "@/components/booking-form";
 
 export default function UploadPage() {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
+  const [extractionStep, setExtractionStep] = useState<ExtractionStep>(1);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleFileAccepted = async (file: File) => {
     setIsUploading(true);
+    setExtractionStep(1);
     try {
       const formData = new FormData();
       formData.append("file", file);
 
+      // Advance to step 2 shortly after upload begins
+      setTimeout(() => setExtractionStep(2), 500);
       const res = await fetch("/api/extract", {
         method: "POST",
         body: formData,
       });
+      setExtractionStep(3);
 
       if (!res.ok) {
         throw new Error("Failed to process file");
       }
 
       const extracted = await res.json();
+      setExtractionStep(4);
 
       // Store extracted data for review page
       sessionStorage.setItem("extractedBooking", JSON.stringify(extracted));
@@ -39,6 +45,7 @@ export default function UploadPage() {
       );
     } finally {
       setIsUploading(false);
+      setExtractionStep(1);
     }
   };
 
@@ -92,6 +99,7 @@ export default function UploadPage() {
               <FileDropzone
                 onFileAccepted={handleFileAccepted}
                 isUploading={isUploading}
+                extractionStep={extractionStep}
               />
             </CardContent>
           </Card>

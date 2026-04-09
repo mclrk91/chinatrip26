@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -25,23 +27,41 @@ export function DeleteConfirmDialog({
   title,
   isLoading = false,
 }: DeleteConfirmDialogProps) {
+  const [confirmText, setConfirmText] = useState("");
+
+  useEffect(() => {
+    if (!open) setConfirmText("");
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>Permanently delete this booking?</DialogTitle>
           <DialogDescription className="text-base">
-            This will remove <strong>&ldquo;{title}&rdquo;</strong> from your itinerary. This action cannot be undone.
+            This will permanently remove <strong>&ldquo;{title}&rdquo;</strong> from your itinerary. This cannot be undone.
           </DialogDescription>
         </DialogHeader>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Type <strong className="text-foreground">DELETE</strong> to confirm:
+          </p>
+          <Input
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            placeholder="DELETE"
+            className="font-mono"
+            autoComplete="off"
+          />
+        </div>
         <DialogFooter className="gap-3 sm:gap-2">
           <Button variant="outline" onClick={onClose} disabled={isLoading} className="flex-1 sm:flex-initial">
-            No, Keep It
+            Cancel
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
-            disabled={isLoading}
+            disabled={isLoading || confirmText !== "DELETE"}
             className="flex-1 sm:flex-initial"
           >
             {isLoading ? "Deleting..." : "Yes, Delete It"}

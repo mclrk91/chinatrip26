@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { format } from "date-fns";
-import { Plane, Building2, MapPin, Bus, Utensils, HelpCircle } from "lucide-react";
+import { Plane, Building2, MapPin, Bus, Utensils, HelpCircle, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS } from "@/lib/constants";
@@ -16,6 +18,43 @@ const TYPE_ICONS: Record<string, React.ElementType> = {
   restaurant: Utensils,
   other: HelpCircle,
 };
+
+function ConfirmationCodeRow({ timeStr, code }: { timeStr: string; code: string | null }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      toast.success(`Copied: ${code}`);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
+      {timeStr && <span>{timeStr}</span>}
+      {code && (
+        <button
+          onClick={handleCopy}
+          className="inline-flex items-center gap-1 font-mono text-xs bg-muted hover:bg-muted/80 px-2 py-0.5 rounded cursor-pointer transition-colors"
+          title={`Copy ${code}`}
+        >
+          {code}
+          {copied ? (
+            <Check className="h-3 w-3 text-jade flex-shrink-0" />
+          ) : (
+            <Copy className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
 
 interface BookingCardProps {
   booking: Booking;
@@ -92,14 +131,7 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
             </p>
           )}
 
-          <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
-            {timeStr && <span>{timeStr}</span>}
-            {booking.confirmation_code && (
-              <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded">
-                {booking.confirmation_code}
-              </span>
-            )}
-          </div>
+          <ConfirmationCodeRow timeStr={timeStr} code={booking.confirmation_code} />
 
           {booking.travelers && booking.travelers.length > 0 && (
             <p className="text-sm mt-1 text-muted-foreground">

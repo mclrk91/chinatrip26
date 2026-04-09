@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const submittingRef = useRef(false);
 
   const handleDigit = (digit: string) => {
     if (pin.length < 4) {
@@ -24,7 +26,8 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async () => {
-    if (pin.length !== 4) return;
+    if (pin.length !== 4 || submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     setError("");
 
@@ -47,13 +50,17 @@ export default function LoginPage() {
       setPin("");
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   };
 
   // Auto-submit when 4 digits entered
-  if (pin.length === 4 && !loading && !error) {
-    handleSubmit();
-  }
+  useEffect(() => {
+    if (pin.length === 4 && !loading && !error) {
+      handleSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pin]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-cream">
@@ -67,11 +74,11 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* PIN Display */}
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-2 sm:gap-3">
             {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="w-14 h-14 rounded-lg border-2 flex items-center justify-center text-2xl font-bold"
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg border-2 flex items-center justify-center text-2xl font-bold"
                 style={{
                   borderColor: pin.length > i ? "#C41E3A" : "#d4cfc9",
                   backgroundColor: pin.length > i ? "#fef2f2" : "white",

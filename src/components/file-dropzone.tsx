@@ -2,18 +2,72 @@
 
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, FileText, ImageIcon } from "lucide-react";
+import { Upload, FileText, ImageIcon, CheckCircle2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+export type ExtractionStep = 1 | 2 | 3 | 4;
 
 interface FileDropzoneProps {
   onFileAccepted: (file: File) => void;
   isUploading: boolean;
+  extractionStep?: ExtractionStep;
 }
 
-export function FileDropzone({ onFileAccepted, isUploading }: FileDropzoneProps) {
+const STEP_LABELS: Record<ExtractionStep, string> = {
+  1: "Uploading file...",
+  2: "Analyzing document...",
+  3: "Extracting booking details...",
+  4: "Ready for review",
+};
+
+function StepIndicator({ currentStep }: { currentStep: ExtractionStep }) {
+  return (
+    <div className="space-y-2 text-left w-full max-w-xs mx-auto">
+      {([1, 2, 3, 4] as ExtractionStep[]).map((step) => {
+        const isDone = step < currentStep;
+        const isActive = step === currentStep;
+        const isPending = step > currentStep;
+
+        return (
+          <div
+            key={step}
+            className={`flex items-center gap-2 text-sm ${
+              isPending ? "text-muted-foreground/50" : "text-foreground"
+            }`}
+          >
+            {isDone ? (
+              <CheckCircle2 className="h-4 w-4 text-jade flex-shrink-0" />
+            ) : isActive ? (
+              <Loader2 className="h-4 w-4 text-china-red animate-spin flex-shrink-0" />
+            ) : (
+              <div className="h-4 w-4 rounded-full border border-muted-foreground/30 flex-shrink-0" />
+            )}
+            <span className={isActive ? "font-medium" : ""}>
+              Step {step}: {STEP_LABELS[step]}
+              {isDone && " ✓"}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function FileDropzone({ onFileAccepted, isUploading, extractionStep }: FileDropzoneProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
-        onFileAccepted(acceptedFiles[0]);
+        const file = acceptedFiles[0];
+        if (file.size > MAX_FILE_SIZE) {
+          const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+          toast.error(
+            `This file is too large (${sizeMB}MB). Maximum size is 10MB. Try taking a screenshot instead.`
+          );
+          return;
+        }
+        onFileAccepted(file);
       }
     },
     [onFileAccepted]
@@ -29,6 +83,7 @@ export function FileDropzone({ onFileAccepted, isUploading }: FileDropzoneProps)
       "image/heif": [".heif"],
     },
     maxFiles: 1,
+    maxSize: MAX_FILE_SIZE,
     disabled: isUploading,
   });
 
@@ -48,9 +103,8 @@ export function FileDropzone({ onFileAccepted, isUploading }: FileDropzoneProps)
       <input {...getInputProps()} />
 
       {isUploading ? (
-        <div className="space-y-3">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red mx-auto" />
-          <p className="text-lg text-muted-foreground">Processing your file...</p>
+        <div className="space-y-4 w-full">
+          <StepIndicator currentStep={extractionStep || 1} />
         </div>
       ) : file ? (
         <div className="space-y-3">
@@ -73,6 +127,9 @@ export function FileDropzone({ onFileAccepted, isUploading }: FileDropzoneProps)
             </p>
             <p className="text-muted-foreground mt-1">
               PDF, JPG, PNG, or HEIC (from iPhone)
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Maximum file size: 10MB
             </p>
           </div>
         </div>
