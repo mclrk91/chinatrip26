@@ -3,8 +3,10 @@
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Search, Sparkles } from "lucide-react";
+import { Search, Sparkles, ChevronDown } from "lucide-react";
+import { format, addDays } from "date-fns";
 import { ItineraryTimeline } from "@/components/itinerary-timeline";
+import { CITIES_BY_DATE } from "@/lib/constants";
 import { BookingDetail } from "@/components/booking-detail";
 import { EditBookingDialog } from "@/components/edit-booking-dialog";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
@@ -157,52 +159,59 @@ function HomeContent() {
     <div className="min-h-screen pb-24">
       {/* Header with Search */}
       <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
-        {/* Search bar - first element */}
-        <div
-          className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 mb-3 cursor-pointer hover:border-gray-300 transition-colors"
-          onClick={() => router.push("/search")}
-        >
-          <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-          <span className="text-muted-foreground text-base">Search bookings...</span>
-        </div>
-
-        {/* Title row + Ask AI button */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">
-              <span className="text-china-red">Thailand & China</span>{" "}
-              <span className="text-muted-foreground font-normal">Oct 2026</span>
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Oct 5 – 24, 2026
-            </p>
+        {/* Search + Ask AI row */}
+        <div className="flex items-center gap-2 mb-2">
+          <div
+            className="flex-1 flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 cursor-pointer hover:border-gray-300 transition-colors"
+            onClick={() => router.push("/search")}
+          >
+            <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <span className="text-muted-foreground text-base">Search bookings...</span>
           </div>
           <button
             onClick={() => router.push("/search?mode=ai")}
-            className="flex items-center gap-1.5 px-3 py-2 bg-china-red/10 text-china-red rounded-lg text-sm font-medium hover:bg-china-red/20 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2.5 bg-china-red/10 text-china-red rounded-xl text-sm font-medium hover:bg-china-red/20 transition-colors flex-shrink-0"
           >
             <Sparkles className="h-4 w-4" />
             Ask AI
           </button>
         </div>
 
-        {/* Quick day jump */}
-        {bookings.length > 0 && (
-          <div className="flex gap-1 mt-2 overflow-x-auto pb-1 scrollbar-hide">
-            {Array.from({ length: 20 }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  const el = document.getElementById(`day-${i + 1}`);
-                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-                className="flex-shrink-0 w-8 h-8 rounded-full text-xs font-medium bg-white border border-gray-200 text-near-black hover:bg-china-red hover:text-white hover:border-china-red transition-colors"
-              >
-                {i + 1}
-              </button>
-            ))}
+        {/* Title row + Jump to day */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-bold">
+              <span className="text-china-red">Thailand & China</span>{" "}
+              <span className="text-muted-foreground font-normal text-base">Oct 2026</span>
+            </h1>
           </div>
-        )}
+          {bookings.length > 0 && (
+            <div className="relative">
+              <select
+                onChange={(e) => {
+                  const el = document.getElementById(e.target.value);
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  e.target.value = "";
+                }}
+                defaultValue=""
+                className="appearance-none bg-white border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 text-sm font-medium text-near-black cursor-pointer hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-china-red/30"
+              >
+                <option value="" disabled>Jump to day...</option>
+                {Array.from({ length: 20 }, (_, i) => {
+                  const date = addDays(new Date("2026-10-05T00:00:00"), i);
+                  const dateStr = format(date, "yyyy-MM-dd");
+                  const city = CITIES_BY_DATE[dateStr] || "";
+                  return (
+                    <option key={i} value={`day-${i + 1}`}>
+                      Day {i + 1} — {format(date, "EEE, MMM d")} — {city}
+                    </option>
+                  );
+                })}
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Content */}

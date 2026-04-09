@@ -12,6 +12,15 @@
   }
 }
 
+/* Force-hide Vercel toolbar/widget injected on deployments */
+[data-vercel-toolbar],
+#vercel-toolbar,
+#__next-build-indicator,
+#__vercel-toolbar-portal,
+vercel-live-feedback {
+  display: none !important;
+}
+
 @layer base {
   :root {
     --background: #F5F0EB;
