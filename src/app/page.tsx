@@ -7,6 +7,8 @@ import { BookingDetail } from "@/components/booking-detail";
 import { EditBookingDialog } from "@/components/edit-booking-dialog";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 import { BottomNav } from "@/components/bottom-nav";
+import { JumpToDay } from "@/components/jump-to-day";
+import { FilterChips } from "@/components/filter-chips";
 import type { Booking } from "@/lib/supabase/types";
 import type { BookingFormData } from "@/components/booking-form";
 
@@ -22,6 +24,7 @@ export default function HomePage() {
   const [deleteBooking, setDeleteBooking] = useState<Booking | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
 
   const fetchBookings = useCallback(async () => {
     try {
@@ -43,6 +46,21 @@ export default function HomePage() {
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  const handleFilterToggle = (type: string) => {
+    setActiveFilters((prev) => {
+      if (type === "all") {
+        return new Set();
+      }
+      const next = new Set(prev);
+      if (next.has(type)) {
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
+      return next;
+    });
+  };
 
   const handleBookingClick = (booking: Booking) => {
     setSelectedBooking(booking);
@@ -128,13 +146,15 @@ export default function HomePage() {
     <div className="min-h-screen pb-24">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
-        <h1 className="text-xl font-bold">
-          <span className="text-china-red">Thailand & China</span>{" "}
-          <span className="text-muted-foreground font-normal">Oct 2026</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {bookings.filter((b) => b.status === "confirmed").length} confirmed bookings
-        </p>
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-xl font-bold">
+            <span className="text-china-red">Thailand & China</span>{" "}
+            <span className="text-muted-foreground font-normal">Oct 2026</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {bookings.filter((b) => b.status === "confirmed").length} confirmed bookings
+          </p>
+        </div>
       </header>
 
       {/* Content */}
@@ -150,7 +170,7 @@ export default function HomePage() {
             <p className="text-muted-foreground mb-4">{error}</p>
             <button
               onClick={() => { setLoading(true); fetchBookings(); }}
-              className="text-china-red underline text-lg"
+              className="text-china-red underline text-lg active:scale-95 active:opacity-80 transition-all"
             >
               Try again
             </button>
@@ -166,12 +186,27 @@ export default function HomePage() {
             </p>
           </div>
         ) : (
-          <ItineraryTimeline
-            bookings={bookings}
-            onBookingClick={handleBookingClick}
-          />
+          <>
+            {/* Filter Chips */}
+            <FilterChips
+              bookings={bookings}
+              activeFilters={activeFilters}
+              onToggle={handleFilterToggle}
+            />
+
+            <div className="mt-4">
+              <ItineraryTimeline
+                bookings={bookings}
+                onBookingClick={handleBookingClick}
+                activeFilters={activeFilters}
+              />
+            </div>
+          </>
         )}
       </main>
+
+      {/* Jump to Day floating button */}
+      {!loading && bookings.length > 0 && <JumpToDay />}
 
       {/* Bottom Navigation */}
       <BottomNav />

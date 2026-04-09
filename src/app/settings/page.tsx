@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BottomNav } from "@/components/bottom-nav";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function SettingsPage() {
   const [seeding, setSeeding] = useState(false);
@@ -33,8 +34,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-24 px-4 pt-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Settings</h1>
+    <PageWrapper>
+      <h1 className="text-2xl font-bold mb-6 pt-2">Settings</h1>
 
       <div className="space-y-4">
         <Card>
@@ -85,6 +86,6 @@ export default function SettingsPage() {
       </div>
 
       <BottomNav />
-    </div>
+    </PageWrapper>
   );
 }

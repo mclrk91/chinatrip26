@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileDropzone } from "@/components/file-dropzone";
 import { BookingForm, type BookingFormData } from "@/components/booking-form";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -30,9 +31,28 @@ export default function UploadPage() {
 
       const extracted = await res.json();
 
-      // Store extracted data for review page
+      // Try to save draft server-side for refresh resilience
+      let draftId: string | null = null;
+      try {
+        const draftRes = await fetch("/api/drafts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(extracted),
+        });
+        const draftData = await draftRes.json();
+        draftId = draftData.id || null;
+      } catch {
+        // Draft API not available — fall through to sessionStorage
+      }
+
+      // Always store in sessionStorage as fallback
       sessionStorage.setItem("extractedBooking", JSON.stringify(extracted));
-      router.push("/upload/review");
+
+      if (draftId) {
+        router.push(`/upload/review?draft=${draftId}`);
+      } else {
+        router.push("/upload/review");
+      }
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to process file. Please try again."
@@ -67,15 +87,15 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen pb-24 px-4 pt-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Add a Booking</h1>
+    <PageWrapper>
+      <h1 className="text-2xl font-bold mb-6 pt-2">Add a Booking</h1>
 
       <Tabs defaultValue="upload" className="w-full">
         <TabsList className="w-full">
-          <TabsTrigger value="upload" className="flex-1">
+          <TabsTrigger value="upload" className="flex-1 active:scale-95 transition-all">
             Upload File
           </TabsTrigger>
-          <TabsTrigger value="manual" className="flex-1">
+          <TabsTrigger value="manual" className="flex-1 active:scale-95 transition-all">
             Type It In
           </TabsTrigger>
         </TabsList>
@@ -115,6 +135,6 @@ export default function UploadPage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </PageWrapper>
   );
 }

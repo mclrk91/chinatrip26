@@ -10,9 +10,9 @@ export const BOOKING_TYPE_COLORS: Record<BookingType, string> = {
   flight: "#C41E3A",
   hotel: "#D4AF37",
   tour: "#1B4D3E",
-  activity: "#1B4D3E",
+  activity: "#008080",
   transport: "#4A90D9",
-  restaurant: "#6B7280",
+  restaurant: "#CC5500",
   other: "#6B7280",
 };
 

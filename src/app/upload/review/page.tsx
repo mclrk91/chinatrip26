@@ -1,28 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { BookingForm, type BookingFormData } from "@/components/booking-form";
+import { PageWrapper } from "@/components/page-wrapper";
 
-export default function ReviewPage() {
+function ReviewContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const draftId = searchParams.get("draft");
+
   const [extractedData, setExtractedData] = useState<Record<string, unknown> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("extractedBooking");
-    if (stored) {
-      try {
-        setExtractedData(JSON.parse(stored));
-      } catch {
+    async function loadDraft() {
+      // Try server-side draft first
+      if (draftId) {
+        try {
+          const res = await fetch(`/api/drafts/${draftId}`);
+          if (res.ok) {
+            const draft = await res.json();
+            setExtractedData(draft.data || draft);
+            return;
+          }
+        } catch {
+          // Fall through to sessionStorage
+        }
+      }
+
+      // Fallback: sessionStorage
+      const stored = sessionStorage.getItem("extractedBooking");
+      if (stored) {
+        try {
+          setExtractedData(JSON.parse(stored));
+        } catch {
+          router.push("/upload");
+        }
+      } else {
         router.push("/upload");
       }
-    } else {
-      router.push("/upload");
     }
-  }, [router]);
+
+    loadDraft();
+  }, [router, draftId]);
 
   const handleSubmit = async (data: BookingFormData) => {
     setIsSaving(true);
@@ -37,7 +61,12 @@ export default function ReviewPage() {
         throw new Error("Failed to save booking");
       }
 
+      // Clean up draft
       sessionStorage.removeItem("extractedBooking");
+      if (draftId) {
+        fetch(`/api/drafts/${draftId}`, { method: "DELETE" }).catch(() => {});
+      }
+
       toast.success("Booking saved successfully!");
       router.push("/");
     } catch (error) {
@@ -49,6 +78,14 @@ export default function ReviewPage() {
     }
   };
 
+  const handleCancel = () => {
+    sessionStorage.removeItem("extractedBooking");
+    if (draftId) {
+      fetch(`/api/drafts/${draftId}`, { method: "DELETE" }).catch(() => {});
+    }
+    router.push("/upload");
+  };
+
   if (!extractedData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -58,12 +95,20 @@ export default function ReviewPage() {
   }
 
   return (
-    <div className="min-h-screen pb-24 px-4 pt-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-2">Review Booking Details</h1>
-      <p className="text-muted-foreground mb-6">
+    <PageWrapper>
+      <h1 className="text-2xl font-bold mb-2 pt-2">Review Booking Details</h1>
+      <p className="text-muted-foreground mb-4">
         We extracted these details from your file. Please check everything looks
         right and make any corrections before saving.
       </p>
+
+      <Button
+        variant="outline"
+        className="mb-4 w-full active:scale-95 active:opacity-80 transition-all"
+        onClick={handleCancel}
+      >
+        Upload a Different File
+      </Button>
 
       <Card>
         <CardHeader>
@@ -73,15 +118,26 @@ export default function ReviewPage() {
           <BookingForm
             initialData={extractedData as Record<string, unknown>}
             onSubmit={handleSubmit}
-            onCancel={() => {
-              sessionStorage.removeItem("extractedBooking");
-              router.push("/upload");
-            }}
+            onCancel={handleCancel}
             submitLabel="Looks Good — Save It"
             isLoading={isSaving}
           />
         </CardContent>
       </Card>
-    </div>
+    </PageWrapper>
+  );
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red" />
+        </div>
+      }
+    >
+      <ReviewContent />
+    </Suspense>
   );
 }

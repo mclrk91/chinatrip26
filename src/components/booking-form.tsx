@@ -44,6 +44,10 @@ interface BookingFormProps {
   isLoading?: boolean;
 }
 
+// Default trip date range for date pickers
+const TRIP_DATE_MIN = "2026-10-05T00:00";
+const TRIP_DATE_MAX = "2026-10-24T23:59";
+
 export function BookingForm({
   initialData = {},
   onSubmit,
@@ -74,6 +78,18 @@ export function BookingForm({
     extracted_text: initialData.extracted_text || undefined,
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const details = formData.details as Record<string, string>;
+
+  const updateDetail = (key: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      details: { ...prev.details, [key]: value },
+    }));
+  };
+
   const toggleTraveler = (name: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -83,8 +99,39 @@ export function BookingForm({
     }));
   };
 
+  const toggleAllTravelers = () => {
+    setFormData((prev) => ({
+      ...prev,
+      travelers:
+        prev.travelers.length === TRAVELERS.length
+          ? []
+          : [...TRAVELERS],
+    }));
+  };
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    if (formData.date_start && formData.date_end) {
+      if (new Date(formData.date_end) < new Date(formData.date_start)) {
+        newErrors.date_end = "End date must be after start date";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted(true);
+
+    if (!validate()) return;
+
     const submitData = {
       ...formData,
       date_start: formData.date_start
@@ -97,6 +144,8 @@ export function BookingForm({
     await onSubmit(submitData);
   };
 
+  const showTitleError = submitted && !formData.title.trim();
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Type */}
@@ -106,7 +155,7 @@ export function BookingForm({
           value={formData.type}
           onValueChange={(value) => setFormData((prev) => ({ ...prev, type: value }))}
         >
-          <SelectTrigger>
+          <SelectTrigger className="active:scale-[0.98] transition-all">
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
@@ -121,14 +170,20 @@ export function BookingForm({
 
       {/* Title */}
       <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
+        <Label htmlFor="title">Title <span className="text-china-red">*</span></Label>
         <Input
           id="title"
           value={formData.title}
-          onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+          onChange={(e) => {
+            setFormData((prev) => ({ ...prev, title: e.target.value }));
+            if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
+          }}
           placeholder="e.g., Tampa to New York"
-          required
+          className={showTitleError ? "border-red-500 focus-visible:ring-red-500" : ""}
         />
+        {showTitleError && (
+          <p className="text-sm text-red-500">Title is required</p>
+        )}
       </div>
 
       {/* Provider */}
@@ -160,16 +215,162 @@ export function BookingForm({
         />
       </div>
 
+      {/* Type-Specific Fields */}
+      {formData.type === "flight" && (
+        <div className="space-y-4 p-4 bg-red-50/50 rounded-lg border border-red-100">
+          <p className="text-sm font-semibold text-china-red">Flight Details</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="departure_airport" className="text-sm">Departure Airport</Label>
+              <Input
+                id="departure_airport"
+                value={details.departure_airport || ""}
+                onChange={(e) => updateDetail("departure_airport", e.target.value)}
+                placeholder="e.g., TPA"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="arrival_airport" className="text-sm">Arrival Airport</Label>
+              <Input
+                id="arrival_airport"
+                value={details.arrival_airport || ""}
+                onChange={(e) => updateDetail("arrival_airport", e.target.value)}
+                placeholder="e.g., JFK"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="flight_number" className="text-sm">Flight Number</Label>
+              <Input
+                id="flight_number"
+                value={details.flight_number || ""}
+                onChange={(e) => updateDetail("flight_number", e.target.value)}
+                placeholder="e.g., DL1234"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="seats" className="text-sm">Seat Assignments</Label>
+              <Input
+                id="seats"
+                value={details.seats || ""}
+                onChange={(e) => updateDetail("seats", e.target.value)}
+                placeholder="e.g., 12A, 12B"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {formData.type === "hotel" && (
+        <div className="space-y-4 p-4 bg-yellow-50/50 rounded-lg border border-yellow-100">
+          <p className="text-sm font-semibold text-yellow-700">Hotel Details</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="city" className="text-sm">City</Label>
+              <Input
+                id="city"
+                value={details.city || ""}
+                onChange={(e) => updateDetail("city", e.target.value)}
+                placeholder="e.g., Bangkok"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="room_type" className="text-sm">Room Type</Label>
+              <Input
+                id="room_type"
+                value={details.room_type || ""}
+                onChange={(e) => updateDetail("room_type", e.target.value)}
+                placeholder="e.g., Deluxe King"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="check_in" className="text-sm">Check-in Time</Label>
+              <Input
+                id="check_in"
+                value={details.check_in || ""}
+                onChange={(e) => updateDetail("check_in", e.target.value)}
+                placeholder="e.g., 3:00 PM"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="check_out" className="text-sm">Check-out Time</Label>
+              <Input
+                id="check_out"
+                value={details.check_out || ""}
+                onChange={(e) => updateDetail("check_out", e.target.value)}
+                placeholder="e.g., 11:00 AM"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="num_rooms" className="text-sm">Number of Rooms</Label>
+            <Input
+              id="num_rooms"
+              value={details.num_rooms || ""}
+              onChange={(e) => updateDetail("num_rooms", e.target.value)}
+              placeholder="e.g., 2"
+            />
+          </div>
+        </div>
+      )}
+
+      {(formData.type === "tour" || formData.type === "activity") && (
+        <div className="space-y-4 p-4 bg-green-50/50 rounded-lg border border-green-100">
+          <p className="text-sm font-semibold text-jade">
+            {formData.type === "tour" ? "Tour" : "Activity"} Details
+          </p>
+          <div className="space-y-1">
+            <Label htmlFor="meeting_point" className="text-sm">Meeting Point</Label>
+            <Input
+              id="meeting_point"
+              value={details.meeting_point || ""}
+              onChange={(e) => updateDetail("meeting_point", e.target.value)}
+              placeholder="e.g., Hotel lobby"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="duration" className="text-sm">Duration</Label>
+            <Input
+              id="duration"
+              value={details.duration || ""}
+              onChange={(e) => updateDetail("duration", e.target.value)}
+              placeholder="e.g., 4 hours"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="includes" className="text-sm">What&apos;s Included</Label>
+            <Textarea
+              id="includes"
+              value={details.includes || ""}
+              onChange={(e) => updateDetail("includes", e.target.value)}
+              placeholder="e.g., Guide, entrance fees, lunch"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Travelers */}
       <div className="space-y-2">
-        <Label>Who is on this booking?</Label>
+        <div className="flex items-center justify-between">
+          <Label>Who is on this booking?</Label>
+          <button
+            type="button"
+            onClick={toggleAllTravelers}
+            className="text-sm text-china-red font-medium hover:underline active:scale-95 transition-all"
+          >
+            {formData.travelers.length === TRAVELERS.length ? "Deselect All" : "Select All"}
+          </button>
+        </div>
         <div className="grid grid-cols-2 gap-2">
           {TRAVELERS.map((name) => (
             <button
               key={name}
               type="button"
               onClick={() => toggleTraveler(name)}
-              className={`h-12 rounded-lg border text-base font-medium transition-colors ${
+              className={`h-12 rounded-lg border text-base font-medium transition-all active:scale-90 ${
                 formData.travelers.includes(name)
                   ? "bg-china-red text-white border-china-red"
                   : "bg-white text-near-black border-gray-300 hover:border-china-red"
@@ -189,6 +390,8 @@ export function BookingForm({
             id="date_start"
             type="datetime-local"
             value={formData.date_start}
+            min={TRIP_DATE_MIN}
+            max={TRIP_DATE_MAX}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, date_start: e.target.value }))
             }
@@ -200,10 +403,17 @@ export function BookingForm({
             id="date_end"
             type="datetime-local"
             value={formData.date_end}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, date_end: e.target.value }))
-            }
+            min={TRIP_DATE_MIN}
+            max={TRIP_DATE_MAX}
+            onChange={(e) => {
+              setFormData((prev) => ({ ...prev, date_end: e.target.value }));
+              if (errors.date_end) setErrors((prev) => ({ ...prev, date_end: "" }));
+            }}
+            className={errors.date_end ? "border-red-500 focus-visible:ring-red-500" : ""}
           />
+          {errors.date_end && (
+            <p className="text-sm text-red-500">{errors.date_end}</p>
+          )}
         </div>
       </div>
 
@@ -262,12 +472,12 @@ export function BookingForm({
         />
       </div>
 
-      {/* Actions */}
+      {/* Actions — Save is dominant, Cancel is secondary */}
       <div className="flex gap-3 pt-4">
         <Button
           type="submit"
-          className="flex-1"
-          disabled={isLoading || !formData.title}
+          className="flex-[2] active:scale-95 active:opacity-80 transition-all"
+          disabled={isLoading}
         >
           {isLoading ? (
             <span className="flex items-center gap-2">
@@ -278,7 +488,12 @@ export function BookingForm({
             submitLabel
           )}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          className="flex-1 active:scale-95 active:opacity-80 transition-all"
+        >
           Cancel
         </Button>
       </div>

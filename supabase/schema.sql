@@ -53,6 +53,23 @@ CREATE POLICY "Allow all access" ON bookings
   USING (true)
   WITH CHECK (true);
 
+-- Draft bookings (survives page refresh)
+CREATE TABLE IF NOT EXISTS booking_drafts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  data jsonb NOT NULL DEFAULT '{}',
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE booking_drafts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all access on drafts" ON booking_drafts
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+-- Auto-cleanup old drafts (older than 24 hours)
+-- Run periodically via cron or cleanup endpoint
+
 -- Storage bucket for uploaded files
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('booking-files', 'booking-files', true)

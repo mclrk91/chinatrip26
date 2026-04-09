@@ -1,7 +1,8 @@
 "use client";
 
 import { format } from "date-fns";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Share2, FileText } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -31,6 +32,55 @@ function DetailRow({ label, value }: { label: string; value: string | null | und
       <dd className="text-base font-medium mt-0.5">{value}</dd>
     </div>
   );
+}
+
+function buildShareText(booking: Booking): string {
+  const details = booking.details as Record<string, string>;
+  const typeEmoji: Record<string, string> = {
+    flight: "\u2708\uFE0F",
+    hotel: "\uD83C\uDFE8",
+    tour: "\uD83C\uDFAB",
+    activity: "\uD83C\uDFC4",
+    transport: "\uD83D\uDE97",
+    restaurant: "\uD83C\uDF7D\uFE0F",
+    other: "\uD83D\uDCCC",
+  };
+  const emoji = typeEmoji[booking.type] || "";
+
+  let line1 = `${emoji} ${booking.title}`;
+  if (booking.type === "flight" && details?.departure_airport && details?.arrival_airport) {
+    line1 = `${emoji} ${details.departure_airport} \u2192 ${details.arrival_airport}`;
+    if (details.flight_number) line1 += ` | ${booking.provider || ""} ${details.flight_number}`;
+  }
+
+  const dateLine = booking.date_start
+    ? format(new Date(booking.date_start), "MMM d, h:mm a")
+    : "";
+
+  const confLine = booking.confirmation_code
+    ? `Confirmation: ${booking.confirmation_code}`
+    : "";
+
+  return [line1, dateLine, confLine].filter(Boolean).join("\n");
+}
+
+async function handleShare(booking: Booking) {
+  const text = buildShareText(booking);
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ text });
+    } catch {
+      // User cancelled share — ignore
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard \u2014 paste in Messages");
+    } catch {
+      toast.error("Unable to copy to clipboard");
+    }
+  }
 }
 
 export function BookingDetail({
@@ -72,7 +122,7 @@ export function BookingDetail({
             {booking.title}
           </SheetTitle>
           <SheetDescription>
-            {booking.provider && `${booking.provider} · `}
+            {booking.provider && `${booking.provider} \u00B7 `}
             {booking.confirmation_code && `Confirmation: ${booking.confirmation_code}`}
           </SheetDescription>
         </SheetHeader>
@@ -109,7 +159,7 @@ export function BookingDetail({
           {details?.departure_airport && details?.arrival_airport && (
             <DetailRow
               label="Route"
-              value={`${details.departure_airport} → ${details.arrival_airport}`}
+              value={`${details.departure_airport} \u2192 ${details.arrival_airport}`}
             />
           )}
           {details?.seats && <DetailRow label="Seats" value={details.seats} />}
@@ -117,6 +167,9 @@ export function BookingDetail({
           {details?.room_type && <DetailRow label="Room Type" value={details.room_type} />}
           {details?.check_in && <DetailRow label="Check-in" value={details.check_in} />}
           {details?.check_out && <DetailRow label="Check-out" value={details.check_out} />}
+          {details?.meeting_point && <DetailRow label="Meeting Point" value={details.meeting_point} />}
+          {details?.duration && <DetailRow label="Duration" value={details.duration} />}
+          {details?.includes && <DetailRow label="Includes" value={details.includes} />}
           <DetailRow label="Payment" value={booking.payment_method} />
           {cost?.amount != null && (
             <DetailRow
@@ -128,17 +181,31 @@ export function BookingDetail({
           <DetailRow label="Notes" value={booking.notes} />
         </dl>
 
-        {booking.booking_url && (
-          <a
-            href={booking.booking_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-china-red mt-4 text-base font-medium"
-          >
-            <ExternalLink className="h-4 w-4" />
-            View on Booking Site
-          </a>
-        )}
+        {/* Links */}
+        <div className="flex flex-col gap-2 mt-4">
+          {booking.booking_url && (
+            <a
+              href={booking.booking_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-china-red text-base font-medium active:opacity-70 transition-opacity"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View on Booking Site
+            </a>
+          )}
+          {booking.raw_file_url && (
+            <a
+              href={booking.raw_file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sky-blue text-base font-medium active:opacity-70 transition-opacity"
+            >
+              <FileText className="h-4 w-4" />
+              View Original Document
+            </a>
+          )}
+        </div>
 
         {/* Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t">
@@ -147,23 +214,31 @@ export function BookingDetail({
               <Button
                 onClick={() => onEdit(booking)}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 active:scale-95 active:opacity-80 transition-all"
               >
                 Edit
               </Button>
               <Button
                 onClick={() => onCancel(booking)}
                 variant="outline"
-                className="flex-1 text-coral border-coral hover:bg-coral hover:text-white"
+                className="flex-1 text-coral border-coral hover:bg-coral hover:text-white active:scale-95 active:opacity-80 transition-all"
               >
                 Cancel Booking
               </Button>
             </>
           )}
           <Button
+            onClick={() => handleShare(booking)}
+            variant="outline"
+            className="active:scale-95 active:opacity-80 transition-all"
+            title="Share"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+          <Button
             onClick={() => onDelete(booking)}
             variant="destructive"
-            className="flex-1"
+            className="flex-1 active:scale-95 active:opacity-80 transition-all"
           >
             Delete
           </Button>

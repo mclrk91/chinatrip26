@@ -44,7 +44,7 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
 
   return (
     <Card
-      className={`cursor-pointer transition-all hover:shadow-md active:scale-[0.98] ${
+      className={`cursor-pointer transition-all hover:shadow-md active:scale-95 active:opacity-80 active:shadow-lg ${
         isCancelled ? "opacity-50" : ""
       }`}
       onClick={onClick}
