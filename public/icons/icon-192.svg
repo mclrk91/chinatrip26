@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="38" fill="#C41E3A"/>
+  <text x="50%" y="42%" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="67" fill="white">CT</text>
+  <text x="50%" y="72%" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#D4AF37">2026</text>
+  <path d="M28.799999999999997 101.76 L163.2 101.76" stroke="#D4AF37" stroke-width="1.92" opacity="0.6"/>
+</svg>
