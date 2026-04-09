@@ -2,27 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@400;500;600&display=swap');
-
 @layer base {
   :root {
-    --background: #F8F3E6;
-    --foreground: #1C1917;
-    --card: #FFFDFC;
-    --card-foreground: #1C1917;
-    --primary: #8B2131;
+    --background: #F5F0EB;
+    --foreground: #1A1A2E;
+    --card: #ffffff;
+    --card-foreground: #1A1A2E;
+    --primary: #C41E3A;
     --primary-foreground: #ffffff;
     --secondary: #D4AF37;
-    --secondary-foreground: #1C1917;
-    --muted: #F5E1E4;
-    --muted-foreground: #57534E;
+    --secondary-foreground: #1A1A2E;
+    --muted: #e8e3de;
+    --muted-foreground: #6b6b6b;
     --accent: #1B4D3E;
     --accent-foreground: #ffffff;
     --destructive: #E8735A;
     --destructive-foreground: #ffffff;
-    --border: #E8DED1;
-    --input: #E8DED1;
-    --ring: #8B2131;
+    --border: #d4cfc9;
+    --input: #d4cfc9;
+    --ring: #C41E3A;
     --radius: 0.75rem;
   }
 }
@@ -33,33 +31,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-  }
-}
-
-@layer components {
-  .ticket-separator {
-    position: relative;
-    border-top: 3px dashed #D3CDC1;
-    margin: 1.5rem 0;
-  }
-  .ticket-separator::before,
-  .ticket-separator::after {
-    content: '';
-    position: absolute;
-    top: -10px;
-    width: 20px;
-    height: 20px;
-    background-color: rgba(0,0,0,0.4);
-    border-radius: 50%;
-  }
-  .ticket-separator::before {
-    left: -1.5rem;
-  }
-  .ticket-separator::after {
-    right: -1.5rem;
   }
 }

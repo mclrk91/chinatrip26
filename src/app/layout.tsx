@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen bg-brand-bg text-brand-text font-sans">
+      <body className="antialiased min-h-screen">
         {children}
         <Toaster
           position="top-center"
