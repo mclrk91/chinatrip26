@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Plane, Building2, MapPin, Bus, Utensils, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -37,6 +38,9 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
     logoUrl = getHotelLogo(booking.title, booking.provider);
   }
 
+  const [logoFailed, setLogoFailed] = useState(false);
+  const showLogo = logoUrl && !logoFailed;
+
   // Dual time display
   const timeDisplay = booking.date_start
     ? formatDualTime(
@@ -66,18 +70,14 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
     >
       <div className="p-4 flex items-start gap-3">
         {/* Logo or icon */}
-        {logoUrl ? (
-          <div className="flex-shrink-0 mt-0.5 rounded-lg overflow-hidden bg-white border border-gray-100">
+        {showLogo ? (
+          <div className="flex-shrink-0 mt-0.5 rounded-lg overflow-hidden bg-white border border-gray-100 w-10 h-10 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={logoUrl}
-              alt={booking.provider || booking.title}
+              src={logoUrl!}
+              alt=""
               className="w-10 h-10 object-contain"
-              onError={(e) => {
-                // Fallback to icon on error
-                (e.target as HTMLImageElement).style.display = "none";
-                (e.target as HTMLImageElement).parentElement!.classList.add("hidden");
-              }}
+              onError={() => setLogoFailed(true)}
             />
           </div>
         ) : (

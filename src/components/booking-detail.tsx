@@ -86,12 +86,15 @@ export function BookingDetail({
         <SheetHeader>
           <div className="flex items-center gap-2 mb-1">
             {logoUrl && (
-              <div className="rounded-lg overflow-hidden bg-white border border-gray-100 flex-shrink-0">
+              <div className="rounded-lg overflow-hidden bg-white border border-gray-100 flex-shrink-0 w-12 h-12 flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={logoUrl}
                   alt={booking.provider || booking.title}
                   className="w-12 h-12 object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).parentElement!.style.display = "none";
+                  }}
                 />
               </div>
             )}

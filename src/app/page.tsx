@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Search, Sparkles } from "lucide-react";
 import { ItineraryTimeline } from "@/components/itinerary-timeline";
@@ -13,8 +13,9 @@ import { BottomNav } from "@/components/bottom-nav";
 import type { Booking } from "@/lib/supabase/types";
 import type { BookingFormData } from "@/components/booking-form";
 
-export default function HomePage() {
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +50,22 @@ export default function HomePage() {
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  // Scroll to day when coming from calendar
+  useEffect(() => {
+    if (!loading && bookings.length > 0) {
+      const scrollTo = searchParams.get("scrollTo");
+      if (scrollTo) {
+        // Small delay so the DOM is painted
+        setTimeout(() => {
+          const el = document.getElementById(scrollTo);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 100);
+      }
+    }
+  }, [loading, bookings.length, searchParams]);
 
   const handleBookingClick = (booking: Booking) => {
     setSelectedBooking(booking);
@@ -168,6 +185,24 @@ export default function HomePage() {
             Ask AI
           </button>
         </div>
+
+        {/* Quick day jump */}
+        {bookings.length > 0 && (
+          <div className="flex gap-1 mt-2 overflow-x-auto pb-1 scrollbar-hide">
+            {Array.from({ length: 20 }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  const el = document.getElementById(`day-${i + 1}`);
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className="flex-shrink-0 w-8 h-8 rounded-full text-xs font-medium bg-white border border-gray-200 text-near-black hover:bg-china-red hover:text-white hover:border-china-red transition-colors"
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Content */}
@@ -254,5 +289,17 @@ export default function HomePage() {
         isLoading={deleteLoading}
       />
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-china-red" />
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

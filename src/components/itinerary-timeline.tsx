@@ -47,9 +47,9 @@ export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelin
   return (
     <div className="space-y-6">
       {days.map((day) => (
-        <div key={day.dateStr}>
+        <div key={day.dateStr} id={`day-${day.dayNumber}`}>
           {/* Day Header */}
-          <div className="sticky top-[108px] z-10 bg-cream/95 backdrop-blur-sm pb-2 pt-2">
+          <div className="sticky top-[145px] z-10 bg-cream/95 backdrop-blur-sm pb-2 pt-2">
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-bold text-china-red">
                 Day {day.dayNumber}

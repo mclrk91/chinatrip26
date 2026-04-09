@@ -50,6 +50,7 @@ export default function CalendarPage() {
       </header>
 
       <main className="px-4 pt-4 max-w-2xl mx-auto">
+        <h2 className="text-xl font-bold text-center mb-4">October 2026</h2>
         <div className="grid grid-cols-7 gap-1 mb-2">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
             <div key={d} className="text-center text-xs font-medium text-muted-foreground py-1">
@@ -82,7 +83,7 @@ export default function CalendarPage() {
             return (
               <button
                 key={day.dateStr}
-                onClick={() => router.push(`/#day-${day.dayNumber}`)}
+                onClick={() => router.push(`/?scrollTo=day-${day.dayNumber}`)}
                 className="aspect-square flex flex-col items-center justify-center rounded-lg bg-white border border-gray-100 hover:border-china-red transition-colors relative"
               >
                 <span className="text-sm font-medium">{dayNum}</span>
