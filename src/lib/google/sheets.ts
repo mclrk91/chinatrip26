@@ -62,7 +62,7 @@ export async function getOrCreateSheet(): Promise<string> {
   // Add header row
   await sheets.spreadsheets.values.update({
     spreadsheetId,
-    range: "Bookings!A1:S1",
+    range: "Bookings!A1:W1",
     valueInputOption: "RAW",
     requestBody: {
       values: [
@@ -81,6 +81,10 @@ export async function getOrCreateSheet(): Promise<string> {
           "Seats",
           "Payment Method",
           "Cost",
+          "Booking Platform",
+          "Points Used",
+          "Points Currency",
+          "Card Used",
           "Cancellation Policy",
           "Booking Platform URL",
           "Notes",
@@ -97,6 +101,7 @@ export async function getOrCreateSheet(): Promise<string> {
 
 function bookingToRow(booking: Booking): string[] {
   const details = booking.details as Record<string, string>;
+  const cost = booking.cost as Record<string, unknown> || {};
   return [
     booking.id,
     booking.type,
@@ -111,7 +116,11 @@ function bookingToRow(booking: Booking): string[] {
     details?.arrival_airport || "",
     details?.seats || "",
     booking.payment_method || "",
-    booking.cost ? JSON.stringify(booking.cost) : "",
+    cost?.amount != null ? `${String(cost.currency || "USD")} ${String(cost.amount)}` : "",
+    String(cost?.booking_platform || ""),
+    cost?.points_used ? String(cost.points_used) : "",
+    String(cost?.points_currency || ""),
+    String(cost?.card_used || ""),
     booking.cancellation_policy || "",
     booking.booking_url || "",
     booking.notes || "",
@@ -128,7 +137,7 @@ export async function appendBookingRow(booking: Booking): Promise<void> {
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "Bookings!A:S",
+      range: "Bookings!A:W",
       valueInputOption: "RAW",
       requestBody: {
         values: [bookingToRow(booking)],
@@ -161,7 +170,7 @@ export async function updateBookingRow(booking: Booking): Promise<void> {
     const rowNumber = rowIndex + 1; // 1-indexed
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `Bookings!A${rowNumber}:S${rowNumber}`,
+      range: `Bookings!A${rowNumber}:W${rowNumber}`,
       valueInputOption: "RAW",
       requestBody: {
         values: [bookingToRow(booking)],

@@ -3,14 +3,20 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Trip Command Center",
-  description: "Thailand & China Oct 2026 — Family Trip Planner",
+  title: "China Trip 2026",
+  description: "Trip Command Center for Thailand & China Oct 2026",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "China Trip",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#C41E3A",
 };
 
 export default function RootLayout({
@@ -20,6 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="China Trip" />
+      </head>
       <body className="antialiased min-h-screen">
         {children}
         <Toaster

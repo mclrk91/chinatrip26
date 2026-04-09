@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-const TRAVELERS_LIST = "Mike Clark, Tonya Clark, David P, Amanda Ford";
+const TRAVELERS_LIST = "Mike Clark, Tonya Clark, David Ramos, Amanda Ford";
 
 const SYSTEM_PROMPT = `You are an expert at extracting structured booking information from travel documents.
 Given a travel document (PDF, image, or text), extract the following fields. Return ONLY valid JSON, no markdown.
@@ -28,7 +28,17 @@ Return JSON with these fields:
     "city": "city name",
     "address": "if available"
   },
-  "cost": {"amount": number, "currency": "USD", "points_used": false} or {},
+  "cost": {
+    "amount": number or null,
+    "currency": "USD",
+    "total_cash": number or null,
+    "cash_currency": "USD",
+    "points_used": number or null,
+    "points_currency": "Amex MR | Chase UR | Marriott Bonvoy | Delta SkyMiles | etc.",
+    "booking_platform": "Amex Travel | Chase Travel | airline website | hotel website | Expedia | etc.",
+    "card_used": "Card name + last 4 digits if visible",
+    "payment_notes": "Mix of points and cash | Points only | Cash only"
+  },
   "payment_method": "Credit card type or points program or null",
   "cancellation_policy": "Free-text cancellation terms or null",
   "booking_url": "URL to the booking platform or null",

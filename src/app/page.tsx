@@ -1,16 +1,28 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { ItineraryTimeline } from "@/components/itinerary-timeline";
 import { BookingDetail } from "@/components/booking-detail";
 import { EditBookingDialog } from "@/components/edit-booking-dialog";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 import { BottomNav } from "@/components/bottom-nav";
+import { QuickLinks } from "@/components/quick-links";
+import { AskAI } from "@/components/ask-ai";
 import type { Booking } from "@/lib/supabase/types";
 import type { BookingFormData } from "@/components/booking-form";
 
 export default function HomePage() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
+  const searchParams = useSearchParams();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +55,17 @@ export default function HomePage() {
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  // Handle scrollTo from calendar
+  useEffect(() => {
+    const scrollTo = searchParams.get("scrollTo");
+    if (scrollTo && !loading) {
+      const el = document.getElementById(`day-${scrollTo}`);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      }
+    }
+  }, [searchParams, loading]);
 
   const handleBookingClick = (booking: Booking) => {
     setSelectedBooking(booking);
@@ -128,13 +151,24 @@ export default function HomePage() {
     <div className="min-h-screen pb-24">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
-        <h1 className="text-xl font-bold">
-          <span className="text-china-red">Thailand & China</span>{" "}
-          <span className="text-muted-foreground font-normal">Oct 2026</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {bookings.filter((b) => b.status === "confirmed").length} confirmed bookings
-        </p>
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold">
+                <span className="text-china-red">Thailand & China</span>{" "}
+                <span className="text-muted-foreground font-normal">Oct 2026</span>
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {bookings.filter((b) => b.status === "confirmed").length} confirmed bookings
+              </p>
+            </div>
+            <AskAI bookings={bookings} />
+          </div>
+          {/* Quick Links */}
+          <div className="mt-2">
+            <QuickLinks />
+          </div>
+        </div>
       </header>
 
       {/* Content */}

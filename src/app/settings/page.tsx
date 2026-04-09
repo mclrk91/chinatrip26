@@ -44,7 +44,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-2 text-base">
             <p><strong>Trip:</strong> Thailand & China Oct 2026</p>
             <p><strong>Dates:</strong> October 5 – 24, 2026</p>
-            <p><strong>Travelers:</strong> Mike Clark, Tonya Clark, David P, Amanda Ford</p>
+            <p><strong>Travelers:</strong> Mike Clark, Tonya Clark, David Ramos, Amanda Ford</p>
             <p><strong>Route:</strong> Tampa → Cairo → Beijing → Bangkok → Koh Samui → Chiang Mai → Shenzhen → Tianjin → Xi&apos;an → Chongqing → Hong Kong → Tampa</p>
           </CardContent>
         </Card>
@@ -73,15 +73,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">About</CardTitle>
-          </CardHeader>
-          <CardContent className="text-base text-muted-foreground">
-            <p>Trip Command Center v1.0</p>
-            <p>Built with Next.js, Supabase, and Claude AI</p>
-          </CardContent>
-        </Card>
       </div>
 
       <BottomNav />

@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, PlusCircle, Settings } from "lucide-react";
+import { CalendarDays, PlusCircle, Settings, Calendar } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Itinerary", icon: CalendarDays },
+  { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/upload", label: "Add Booking", icon: PlusCircle },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -27,12 +28,12 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-2 px-4 min-w-[80px] min-h-[56px] transition-colors ${
+              className={`flex flex-col items-center justify-center py-2 px-3 min-w-[64px] min-h-[56px] transition-colors ${
                 isActive ? "text-china-red" : "text-muted-foreground hover:text-near-black"
               }`}
             >
-              <Icon className="h-6 w-6" />
-              <span className="text-xs mt-1 font-medium">{item.label}</span>
+              <Icon className="h-5 w-5" />
+              <span className="text-[11px] mt-0.5 font-medium">{item.label}</span>
             </Link>
           );
         })}
