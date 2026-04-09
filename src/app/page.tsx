@@ -7,11 +7,13 @@ import { BookingDetail } from "@/components/booking-detail";
 import { EditBookingDialog } from "@/components/edit-booking-dialog";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 import { BottomNav } from "@/components/bottom-nav";
+import { SearchBar } from "@/components/search-bar";
 import type { Booking } from "@/lib/supabase/types";
 import type { BookingFormData } from "@/components/booking-form";
 
 export default function HomePage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [filteredBookings, setFilteredBookings] = useState<Booking[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -124,6 +126,8 @@ export default function HomePage() {
     }
   };
 
+  const displayBookings = filteredBookings ?? bookings;
+
   return (
     <div className="min-h-screen pb-24">
       {/* Header */}
@@ -166,10 +170,22 @@ export default function HomePage() {
             </p>
           </div>
         ) : (
-          <ItineraryTimeline
-            bookings={bookings}
-            onBookingClick={handleBookingClick}
-          />
+          <>
+            <SearchBar
+              bookings={bookings}
+              onFilteredBookings={setFilteredBookings}
+            />
+            {filteredBookings !== null && filteredBookings.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No bookings match your search.</p>
+              </div>
+            ) : (
+              <ItineraryTimeline
+                bookings={displayBookings}
+                onBookingClick={handleBookingClick}
+              />
+            )}
+          </>
         )}
       </main>
 
@@ -184,6 +200,7 @@ export default function HomePage() {
         onEdit={handleEdit}
         onCancel={handleCancel}
         onDelete={handleDeleteClick}
+        onBookingUpdated={fetchBookings}
       />
 
       {/* Edit Dialog */}

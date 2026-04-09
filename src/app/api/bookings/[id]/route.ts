@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServiceClient } from "@/lib/supabase/server";
 import { updateBookingRow, deleteBookingRow } from "@/lib/google/sheets";
+import { sendToWanderlog } from "@/lib/wanderlog";
 
 export async function GET(
   _request: Request,
@@ -51,6 +52,17 @@ export async function PUT(
       await updateBookingRow(data);
     } catch (syncErr) {
       console.error("Google Sheets sync error:", syncErr);
+    }
+
+    // Wanderlog sync for flights and hotels (non-blocking)
+    if (data.type === "flight" || data.type === "hotel") {
+      try {
+        const synced = await sendToWanderlog(data);
+        await supabase.from("bookings").update({ wanderlog_synced: synced }).eq("id", data.id);
+        data.wanderlog_synced = synced;
+      } catch (wanderlogErr) {
+        console.error("Wanderlog sync error:", wanderlogErr);
+      }
     }
 
     return NextResponse.json(data);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServiceClient } from "@/lib/supabase/server";
 import { appendBookingRow } from "@/lib/google/sheets";
 import { uploadToDrive } from "@/lib/google/drive";
+import { sendToWanderlog } from "@/lib/wanderlog";
 
 export async function GET() {
   try {
@@ -60,6 +61,17 @@ export async function POST(request: Request) {
       await appendBookingRow(data);
     } catch (syncErr) {
       console.error("Google sync error:", syncErr);
+    }
+
+    // Wanderlog sync for flights and hotels (non-blocking)
+    if (data.type === "flight" || data.type === "hotel") {
+      try {
+        const synced = await sendToWanderlog(data);
+        await supabase.from("bookings").update({ wanderlog_synced: synced }).eq("id", data.id);
+        data.wanderlog_synced = synced;
+      } catch (wanderlogErr) {
+        console.error("Wanderlog sync error:", wanderlogErr);
+      }
     }
 
     return NextResponse.json(data, { status: 201 });
