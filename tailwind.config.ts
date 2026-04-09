@@ -16,6 +16,8 @@ const config: Config = {
         jade: "#1B4D3E",
         "sky-blue": "#4A90D9",
         cream: "#F5F0EB",
+        parchment: "var(--parchment)",
+        divider: "var(--divider)",
         "near-black": "#1A1A2E",
         coral: "#E8735A",
         border: "var(--border)",

@@ -22,6 +22,8 @@
     --input: #d4cfc9;
     --ring: #C41E3A;
     --radius: 0.75rem;
+    --parchment: #F7F4EB;
+    --divider: #E6E2D6;
   }
 }
 
@@ -35,5 +37,31 @@
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Ticket stub perforated separator */
+@layer components {
+  .ticket-separator {
+    position: relative;
+    border-top: 3px dashed var(--divider);
+    margin: 1.5rem 0;
+  }
+  .ticket-separator::before,
+  .ticket-separator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  .ticket-separator::before {
+    left: -1.75rem;
+  }
+  .ticket-separator::after {
+    right: -1.75rem;
   }
 }
