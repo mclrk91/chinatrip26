@@ -126,39 +126,44 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen pb-24">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-cream/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
-        <h1 className="text-xl font-bold">
-          <span className="text-china-red">Thailand & China</span>{" "}
-          <span className="text-muted-foreground font-normal">Oct 2026</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {bookings.filter((b) => b.status === "confirmed").length} confirmed bookings
-        </p>
-      </header>
-
       {/* Content */}
-      <main className="px-4 pt-4 max-w-2xl mx-auto">
+      <main>
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-china-red" />
-            <p className="mt-4 text-muted-foreground">Loading your itinerary...</p>
+            <div
+              className="animate-spin rounded-full h-10 w-10"
+              style={{ border: "2px solid #C41E3A", borderBottomColor: "transparent" }}
+            />
+            <p className="mt-4 text-muted-foreground">Loading your itinerary…</p>
           </div>
         ) : error ? (
-          <div className="text-center py-20">
-            <p className="text-xl font-semibold mb-2 text-red-600">Something went wrong</p>
+          <div className="text-center py-20 px-4">
+            <p
+              className="font-display mb-2"
+              style={{ fontSize: 28, fontWeight: 600, color: "#C41E3A" }}
+            >
+              Something went wrong
+            </p>
             <p className="text-muted-foreground mb-4">{error}</p>
             <button
-              onClick={() => { setLoading(true); fetchBookings(); }}
+              onClick={() => {
+                setLoading(true);
+                fetchBookings();
+              }}
               className="text-china-red underline text-lg"
             >
               Try again
             </button>
           </div>
         ) : bookings.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-xl font-semibold mb-2">No bookings yet</p>
-            <p className="text-muted-foreground mb-2">
+          <div className="text-center py-20 px-4">
+            <p
+              className="font-display mb-2"
+              style={{ fontSize: 28, fontWeight: 600, color: "#6B3410" }}
+            >
+              No bookings yet
+            </p>
+            <p className="text-muted-foreground mb-2" style={{ fontSize: 17 }}>
               Tap &ldquo;Add Booking&rdquo; below to get started
             </p>
             <p className="text-sm text-muted-foreground">
