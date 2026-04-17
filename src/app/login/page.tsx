@@ -60,8 +60,13 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="text-4xl mb-2">&#9992;&#65039;</div>
-          <CardTitle className="text-2xl">Trip Command Center</CardTitle>
-          <p className="text-muted-foreground text-base mt-2">
+          <CardTitle
+            className="font-display"
+            style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.01em", color: "#6B3410" }}
+          >
+            Trip Command Center
+          </CardTitle>
+          <p className="text-muted-foreground text-base mt-2" style={{ fontSize: 16 }}>
             Enter your 4-digit PIN to continue
           </p>
         </CardHeader>

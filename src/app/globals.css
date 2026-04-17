@@ -1,9 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* Paper / cream */
+    --paper-50: #FBF8F4;
+    --paper-100: #F5F0EB;
+    --paper-200: #EFE8DF;
+    --paper-300: #E8E0D4;
+    --paper-400: #D4CFC9;
+
+    /* Ink */
+    --ink-900: #1A1A2E;
+    --ink-700: #3A3A48;
+    --ink-500: #6B6B78;
+    --ink-300: #A8A8B0;
+
+    /* Brand */
+    --china-red-600: #9E1629;
+    --china-red-500: #C41E3A;
+    --china-red-100: #FDEDEF;
+    --gold-600: #B8941F;
+    --gold-500: #D4AF37;
+    --gold-100: #F8EFCB;
+    --jade-700: #143A2E;
+    --jade-500: #1B4D3E;
+    --jade-100: #D4E4DD;
+    --sky-500: #4A90D9;
+    --sky-100: #DEEBF7;
+    --coral-500: #E8735A;
+    --coral-100: #FBE3DC;
+
+    /* Warm brown for display */
+    --brown-700: #4A2309;
+    --brown-600: #6B3410;
+    --brown-500: #8B4513;
+    --brown-300: #8C7B6A;
+    --ink-display: #2B1810;
+
+    /* Semantic (shadcn compat) */
     --background: #F5F0EB;
     --foreground: #1A1A2E;
     --card: #ffffff;
@@ -12,16 +50,28 @@
     --primary-foreground: #ffffff;
     --secondary: #D4AF37;
     --secondary-foreground: #1A1A2E;
-    --muted: #e8e3de;
-    --muted-foreground: #6b6b6b;
+    --muted: #EFE8DF;
+    --muted-foreground: #6B6B78;
     --accent: #1B4D3E;
     --accent-foreground: #ffffff;
     --destructive: #E8735A;
     --destructive-foreground: #ffffff;
-    --border: #d4cfc9;
-    --input: #d4cfc9;
+    --border: #D4CFC9;
+    --input: #D4CFC9;
     --ring: #C41E3A;
-    --radius: 0.75rem;
+    --radius: 0.875rem;
+
+    /* Fonts */
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* Shadows — warm-tinted */
+    --shadow-xs: 0 1px 2px rgba(26, 26, 46, 0.06);
+    --shadow-sm: 0 2px 6px rgba(26, 26, 46, 0.06), 0 1px 2px rgba(26, 26, 46, 0.04);
+    --shadow-md: 0 8px 20px rgba(26, 26, 46, 0.08), 0 2px 6px rgba(26, 26, 46, 0.05);
+    --shadow-lg: 0 16px 36px rgba(26, 26, 46, 0.10), 0 4px 10px rgba(26, 26, 46, 0.06);
+    --shadow-ticket: 0 10px 28px rgba(26, 26, 46, 0.10), 0 2px 6px rgba(26, 26, 46, 0.05);
   }
 }
 
@@ -29,11 +79,54 @@
   * {
     @apply border-border;
   }
+  html,
   body {
-    @apply bg-background text-foreground;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+
+  h3,
+  h4 {
+    font-family: var(--font-body);
+    font-weight: 700;
+  }
+
+  code,
+  .mono {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  .label-caps {
+    font-family: var(--font-body);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  *:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 }
