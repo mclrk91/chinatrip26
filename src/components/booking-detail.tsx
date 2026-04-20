@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +13,22 @@ import {
 } from "@/components/ui/sheet";
 import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS } from "@/lib/constants";
 import type { Booking } from "@/lib/supabase/types";
+
+const DRIVE_FOLDER_URL =
+  "https://drive.google.com/drive/folders/1ZUnI2iQUPp4R7CZ49BRXxPURK0UwaWJp?usp=sharing";
+
+function driveUrlForBooking(booking: Booking): { url: string; isFolder: boolean } {
+  if (booking.gdrive_file_id) {
+    return {
+      url: `https://drive.google.com/file/d/${booking.gdrive_file_id}/view`,
+      isFolder: false,
+    };
+  }
+  if (booking.raw_file_url && booking.raw_file_url.includes("drive.google")) {
+    return { url: booking.raw_file_url, isFolder: false };
+  }
+  return { url: DRIVE_FOLDER_URL, isFolder: true };
+}
 
 interface BookingDetailProps {
   booking: Booking | null;
@@ -128,17 +144,34 @@ export function BookingDetail({
           <DetailRow label="Notes" value={booking.notes} />
         </dl>
 
-        {booking.booking_url && (
-          <a
-            href={booking.booking_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-china-red mt-4 text-base font-medium"
-          >
-            <ExternalLink className="h-4 w-4" />
-            View on Booking Site
-          </a>
-        )}
+        <div className="mt-4 space-y-2">
+          {booking.booking_url && (
+            <a
+              href={booking.booking_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-china-red text-base font-medium"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View on Booking Site
+            </a>
+          )}
+          {(() => {
+            const { url, isFolder } = driveUrlForBooking(booking);
+            return (
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-base font-medium"
+                style={{ color: "#6B3410" }}
+              >
+                <FolderOpen className="h-4 w-4" />
+                {isFolder ? "Open Reservation Folder" : "Open Reservation File"}
+              </a>
+            );
+          })()}
+        </div>
 
         {/* Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t">

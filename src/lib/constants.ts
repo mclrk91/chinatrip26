@@ -1,4 +1,4 @@
-export const TRAVELERS = ["Mike Clark", "Tonya Clark", "David P", "Amanda Ford"] as const;
+export const TRAVELERS = ["Mike Clark", "Tonya Clark", "David Ramos", "Amanda Ford"] as const;
 
 export const BOOKING_TYPES = ["flight", "hotel", "tour", "activity", "transport", "restaurant", "other"] as const;
 export type BookingType = (typeof BOOKING_TYPES)[number];
@@ -90,7 +90,7 @@ export const TRAVELER_META: Record<string, { initial: string; color: string; sho
   "Amanda Ford": { initial: "A", color: "#C41E3A", short: "Amanda" },
   "Mike Clark": { initial: "M", color: "#1B4D3E", short: "Mike" },
   "Tonya Clark": { initial: "T", color: "#B8941F", short: "Tonya" },
-  "David P": { initial: "D", color: "#4A90D9", short: "David" },
+  "David Ramos": { initial: "D", color: "#4A90D9", short: "David" },
 };
 
 export function getTravelerMeta(name: string) {
