@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ChevronLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileDropzone } from "@/components/file-dropzone";
@@ -68,7 +70,20 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Add a Booking</h1>
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1 mb-4 text-base font-medium"
+        style={{ color: "#6B3410" }}
+      >
+        <ChevronLeft className="h-5 w-5" />
+        Back to Itinerary
+      </Link>
+      <h1
+        className="font-display mb-6"
+        style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.01em", color: "#6B3410" }}
+      >
+        Add a Booking
+      </h1>
 
       <Tabs defaultValue="upload" className="w-full">
         <TabsList className="w-full">

@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-const TRAVELERS_LIST = "Mike Clark, Tonya Clark, David P, Amanda Ford";
+const TRAVELERS_LIST = "Mike Clark, Tonya Clark, David Ramos, Amanda Ford";
 
 const SYSTEM_PROMPT = `You are an expert at extracting structured booking information from travel documents.
 Given a travel document (PDF, image, or text), extract the following fields. Return ONLY valid JSON, no markdown.
