@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { format } from "date-fns";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,8 +34,14 @@ interface BookingDetailProps {
   onDelete: (booking: Booking) => void;
 }
 
-function DetailRow({ label, value }: { label: string; value: string | null | undefined }) {
-  if (!value) return null;
+function DetailRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: ReactNode;
+}) {
+  if (value === null || value === undefined || value === "") return null;
   return (
     <div className="py-2 border-b border-gray-100 last:border-0">
       <dt className="text-sm text-muted-foreground">{label}</dt>
@@ -133,6 +140,39 @@ export function BookingDetail({
           {details?.room_type && <DetailRow label="Room Type" value={details.room_type} />}
           {details?.check_in && <DetailRow label="Check-in" value={details.check_in} />}
           {details?.check_out && <DetailRow label="Check-out" value={details.check_out} />}
+          {booking.type === "hotel" && details?.address && (
+            <DetailRow label="Address" value={details.address} />
+          )}
+          {booking.type === "hotel" && details?.phone && (
+            <DetailRow
+              label="Phone"
+              value={
+                <a
+                  href={`tel:${String(details.phone).replace(/[^+\d]/g, "")}`}
+                  style={{ color: "#6B3410", textDecoration: "underline" }}
+                >
+                  {details.phone}
+                </a>
+              }
+            />
+          )}
+          {booking.type === "hotel" && details?.website && (
+            <DetailRow
+              label="Website"
+              value={
+                <a
+                  href={details.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center"
+                  style={{ color: "#6B3410", textDecoration: "underline", gap: 6 }}
+                >
+                  <ExternalLink style={{ width: 14, height: 14 }} />
+                  {details.website}
+                </a>
+              }
+            />
+          )}
           <DetailRow label="Payment" value={booking.payment_method} />
           {cost?.amount != null && (
             <DetailRow

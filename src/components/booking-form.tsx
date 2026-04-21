@@ -223,6 +223,56 @@ export function BookingForm({
         />
       </div>
 
+      {/* Hotel-specific fields */}
+      {formData.type === "hotel" && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="hotel_address">Hotel Address</Label>
+            <Input
+              id="hotel_address"
+              value={(formData.details.address as string) || ""}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  details: { ...prev.details, address: e.target.value },
+                }))
+              }
+              placeholder="Street, city, country"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="hotel_phone">Hotel Phone</Label>
+            <Input
+              id="hotel_phone"
+              type="tel"
+              value={(formData.details.phone as string) || ""}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  details: { ...prev.details, phone: e.target.value },
+                }))
+              }
+              placeholder="+1 555 123 4567"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="hotel_website">Hotel Website</Label>
+            <Input
+              id="hotel_website"
+              type="url"
+              value={(formData.details.website as string) || ""}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  details: { ...prev.details, website: e.target.value },
+                }))
+              }
+              placeholder="https://…"
+            />
+          </div>
+        </>
+      )}
+
       {/* Payment Method */}
       <div className="space-y-2">
         <Label htmlFor="payment_method">Payment Method</Label>
