@@ -6,8 +6,8 @@ VALUES (
   'flight', 'confirmed', 'Tampa to New York (JFK)',
   '2026-10-05T06:00:00-04:00', '2026-10-05T09:30:00-04:00',
   'Delta Air Lines', 'JJ45B9',
-  '{"David P": "JJ4589"}',
-  '{"Mike Clark","Tonya Clark","David P"}',
+  '{"David Ramos": "JJ4589"}',
+  '{"Mike Clark","Tonya Clark","David Ramos"}',
   '{"flight_number": "DL2475", "departure_airport": "TPA", "arrival_airport": "JFK"}'
 );
 
@@ -37,8 +37,8 @@ VALUES (
   'flight', 'confirmed', 'Beijing to Bangkok',
   '2026-10-08T08:00:00+08:00', '2026-10-08T12:30:00+07:00',
   'Hainan Airlines', 'PDK6KW',
-  '{"David P": "QCK7K5"}',
-  '{"Mike Clark","Tonya Clark","David P"}',
+  '{"David Ramos": "QCK7K5"}',
+  '{"Mike Clark","Tonya Clark","David Ramos"}',
   '{"flight_number": "HU429", "departure_airport": "PEK", "arrival_airport": "BKK"}'
 );
 
@@ -48,8 +48,8 @@ VALUES (
   'flight', 'confirmed', 'Bangkok to Koh Samui',
   '2026-10-08T15:00:00+07:00', '2026-10-08T16:20:00+07:00',
   'Bangkok Airways', 'DL2BJG',
-  '{"David P": "DYJW53"}',
-  '{"Mike Clark","Tonya Clark","David P"}',
+  '{"David Ramos": "DYJW53"}',
+  '{"Mike Clark","Tonya Clark","David Ramos"}',
   '{"flight_number": "PG165", "departure_airport": "BKK", "arrival_airport": "USM"}'
 );
 
@@ -59,7 +59,7 @@ VALUES (
   'flight', 'confirmed', 'Koh Samui to Chiang Mai',
   '2026-10-11T10:00:00+07:00', '2026-10-11T11:40:00+07:00',
   'Bangkok Airways', 'DL2BJG',
-  '{"Mike Clark","Tonya Clark","David P"}',
+  '{"Mike Clark","Tonya Clark","David Ramos"}',
   '{"flight_number": "PG241", "departure_airport": "USM", "arrival_airport": "CNX"}'
 );
 
@@ -69,7 +69,7 @@ VALUES (
   'flight', 'pending', 'Chiang Mai to Shenzhen/Hong Kong',
   '2026-10-13T12:00:00+07:00',
   'TBD', 'TBD',
-  '{"Mike Clark","Tonya Clark","David P","Amanda Ford"}',
+  '{"Mike Clark","Tonya Clark","David Ramos","Amanda Ford"}',
   '{"departure_airport": "CNX", "arrival_airport": "SZX/HKG"}',
   'Flight details to be confirmed'
 );
@@ -81,7 +81,7 @@ VALUES (
   '2026-10-23T23:50:00+08:00', '2026-10-24T04:20:00+03:00',
   'Qatar Airways', '7MWYZ9',
   '{"alt": "77R8A7"}',
-  '{"Mike Clark","Tonya Clark","David P"}',
+  '{"Mike Clark","Tonya Clark","David Ramos"}',
   '{"flight_number": "QR815", "departure_airport": "HKG", "arrival_airport": "DOH"}'
 );
 
@@ -92,7 +92,7 @@ VALUES (
   '2026-10-24T08:00:00+03:00', '2026-10-24T14:30:00-05:00',
   'Qatar Airways', '7MWYZ9',
   '{"alt": "77R8A7"}',
-  '{"Mike Clark","Tonya Clark","David P"}',
+  '{"Mike Clark","Tonya Clark","David Ramos"}',
   '{"flight_number": "QR731", "departure_airport": "DOH", "arrival_airport": "DFW"}'
 );
 
@@ -102,8 +102,8 @@ VALUES (
   'flight', 'confirmed', 'Dallas to Tampa',
   '2026-10-24T17:00:00-05:00', '2026-10-24T20:30:00-04:00',
   'American Airlines', 'CSTEDD',
-  '{"David P": "KXRQUY"}',
-  '{"Tonya Clark","David P"}',
+  '{"David Ramos": "KXRQUY"}',
+  '{"Tonya Clark","David Ramos"}',
   '{"flight_number": "AA2512", "departure_airport": "DFW", "arrival_airport": "TPA"}'
 );
 
@@ -115,8 +115,8 @@ VALUES (
   'hotel', 'confirmed', 'Raweekanlaya Resort (Chai Lai Orchid)',
   '2026-10-12T14:00:00+07:00', '2026-10-13T12:00:00+07:00',
   'Chai Lai Orchid', '7636354423128',
-  '{"Mike Clark","Tonya Clark","David P","Amanda Ford"}',
-  '{"city": "Chiang Mai", "check_in": "14:00", "check_out": "12:00"}'
+  '{"Mike Clark","Tonya Clark","David Ramos","Amanda Ford"}',
+  '{"city": "Chiang Mai", "check_in": "14:00", "check_out": "12:00", "address": "202 Moo 9, Mae Win, Mae Wang District, Chiang Mai 50360, Thailand", "phone": "+66 81 952 0983", "website": "https://chailaiorchid.com/"}'
 );
 
 -- 2. Oct 16-18: Conrad Tianjin
@@ -125,8 +125,8 @@ VALUES (
   'hotel', 'confirmed', 'Conrad Tianjin',
   '2026-10-16T15:00:00+08:00', '2026-10-18T12:00:00+08:00',
   'Conrad Hotels (Hilton)', '9091528334393',
-  '{"Mike Clark","Tonya Clark","David P","Amanda Ford"}',
-  '{"city": "Tianjin", "check_in": "15:00", "check_out": "12:00"}'
+  '{"Mike Clark","Tonya Clark","David Ramos","Amanda Ford"}',
+  '{"city": "Tianjin", "check_in": "15:00", "check_out": "12:00", "address": "2 Youyi Road, Hexi District, Tianjin 300061, China", "phone": "+86 22 6550 8888", "website": "https://www.hilton.com/en/hotels/tsnhcci-conrad-tianjin/"}'
 );
 
 -- 3. Oct 18-20: Westin Xi'an
@@ -135,8 +135,8 @@ VALUES (
   'hotel', 'confirmed', 'Westin Xi''an',
   '2026-10-18T15:00:00+08:00', '2026-10-20T12:00:00+08:00',
   'Westin (Marriott)', '76505296',
-  '{"Mike Clark","Tonya Clark","David P","Amanda Ford"}',
-  '{"city": "Xi''an", "check_in": "15:00", "check_out": "12:00"}'
+  '{"Mike Clark","Tonya Clark","David Ramos","Amanda Ford"}',
+  '{"city": "Xi''an", "check_in": "15:00", "check_out": "12:00", "address": "66 Ci En Road, Yanta District, Xi''an 710061, China", "phone": "+86 29 6568 6568", "website": "https://www.marriott.com/en-us/hotels/sianw-the-westin-xian/overview/"}'
 );
 
 -- Seed Data: Amanda's Separate Flights

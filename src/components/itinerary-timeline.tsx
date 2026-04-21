@@ -5,7 +5,8 @@ import { format, addDays, isSameDay, parseISO } from "date-fns";
 import { BookingCard } from "./booking-card";
 import { DayNotes } from "./day-notes";
 import { ItineraryTopBar } from "./itinerary-top-bar";
-import { CITIES_BY_DATE, FLAGS_BY_DATE, TRIP_START, TRIP_DAYS } from "@/lib/constants";
+import { TRIP_START, TRIP_DAYS } from "@/lib/constants";
+import { useTripDays } from "@/lib/use-trip-days";
 import type { Booking, DayNote } from "@/lib/supabase/types";
 
 interface ItineraryTimelineProps {
@@ -22,6 +23,7 @@ export function ItineraryTimeline({
   onDayNotesChange,
 }: ItineraryTimelineProps) {
   const [query, setQuery] = useState("");
+  const { cities, flags } = useTripDays();
 
   const notesByDate = useMemo(() => {
     const map: Record<string, DayNote[]> = {};
@@ -61,12 +63,12 @@ export function ItineraryTimeline({
         dayNumber: i + 1,
         bookings: dayBookings,
         notes: notesByDate[dateStr] || [],
-        city: CITIES_BY_DATE[dateStr] || "",
-        flag: FLAGS_BY_DATE[dateStr] || "",
+        city: cities[dateStr] || "",
+        flag: flags[dateStr] || "",
       });
     }
     return result;
-  }, [bookings, notesByDate]);
+  }, [bookings, notesByDate, cities, flags]);
 
   const q = query.trim().toLowerCase();
   const matches = (b: Booking) => {
