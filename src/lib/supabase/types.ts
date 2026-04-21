@@ -25,3 +25,11 @@ export interface Booking {
 }
 
 export type BookingInsert = Omit<Booking, "id" | "created_at" | "updated_at" | "wanderlog_synced">;
+
+export interface DayNote {
+  id: string;
+  date: string; // YYYY-MM-DD
+  content: string;
+  created_at: string;
+  updated_at: string;
+}

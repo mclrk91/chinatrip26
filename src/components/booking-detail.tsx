@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { ExternalLink, FolderOpen } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,20 +14,15 @@ import {
 import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS } from "@/lib/constants";
 import type { Booking } from "@/lib/supabase/types";
 
-const DRIVE_FOLDER_URL =
-  "https://drive.google.com/drive/folders/1ZUnI2iQUPp4R7CZ49BRXxPURK0UwaWJp?usp=sharing";
-
-function driveUrlForBooking(booking: Booking): { url: string; isFolder: boolean } {
+function confirmationLinkFor(booking: Booking): string | null {
+  if (booking.booking_url) return booking.booking_url;
   if (booking.gdrive_file_id) {
-    return {
-      url: `https://drive.google.com/file/d/${booking.gdrive_file_id}/view`,
-      isFolder: false,
-    };
+    return `https://drive.google.com/file/d/${booking.gdrive_file_id}/view`;
   }
   if (booking.raw_file_url && booking.raw_file_url.includes("drive.google")) {
-    return { url: booking.raw_file_url, isFolder: false };
+    return booking.raw_file_url;
   }
-  return { url: DRIVE_FOLDER_URL, isFolder: true };
+  return null;
 }
 
 interface BookingDetailProps {
@@ -35,7 +30,6 @@ interface BookingDetailProps {
   open: boolean;
   onClose: () => void;
   onEdit: (booking: Booking) => void;
-  onCancel: (booking: Booking) => void;
   onDelete: (booking: Booking) => void;
 }
 
@@ -54,7 +48,6 @@ export function BookingDetail({
   open,
   onClose,
   onEdit,
-  onCancel,
   onDelete,
 }: BookingDetailProps) {
   if (!booking) return null;
@@ -63,6 +56,7 @@ export function BookingDetail({
   const details = booking.details as Record<string, string>;
   const cost = booking.cost as Record<string, unknown>;
   const isCancelled = booking.status === "cancelled";
+  const showStatusBadge = booking.status !== "confirmed";
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -75,14 +69,20 @@ export function BookingDetail({
             >
               {BOOKING_TYPE_LABELS[booking.type]}
             </Badge>
-            <Badge
-              variant="outline"
-              className={`text-sm ${
-                isCancelled ? "text-muted-foreground" : booking.status === "pending" ? "text-coral border-coral" : "text-jade border-jade"
-              }`}
-            >
-              {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-            </Badge>
+            {showStatusBadge && (
+              <Badge
+                variant="outline"
+                className={`text-sm ${
+                  isCancelled
+                    ? "text-muted-foreground"
+                    : booking.status === "pending"
+                    ? "text-coral border-coral"
+                    : "text-jade border-jade"
+                }`}
+              >
+                {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+              </Badge>
+            )}
           </div>
           <SheetTitle className={`text-xl ${isCancelled ? "line-through" : ""}`}>
             {booking.title}
@@ -145,19 +145,9 @@ export function BookingDetail({
         </dl>
 
         <div className="mt-4 space-y-2">
-          {booking.booking_url && (
-            <a
-              href={booking.booking_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-china-red text-base font-medium"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View on Booking Site
-            </a>
-          )}
           {(() => {
-            const { url, isFolder } = driveUrlForBooking(booking);
+            const url = confirmationLinkFor(booking);
+            if (!url) return null;
             return (
               <a
                 href={url}
@@ -166,8 +156,8 @@ export function BookingDetail({
                 className="flex items-center gap-2 text-base font-medium"
                 style={{ color: "#6B3410" }}
               >
-                <FolderOpen className="h-4 w-4" />
-                {isFolder ? "Open Reservation Folder" : "Open Reservation File"}
+                <ExternalLink className="h-4 w-4" />
+                Open Booking Confirmation Link
               </a>
             );
           })()}
@@ -175,24 +165,13 @@ export function BookingDetail({
 
         {/* Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t">
-          {!isCancelled && (
-            <>
-              <Button
-                onClick={() => onEdit(booking)}
-                variant="outline"
-                className="flex-1"
-              >
-                Edit
-              </Button>
-              <Button
-                onClick={() => onCancel(booking)}
-                variant="outline"
-                className="flex-1 text-coral border-coral hover:bg-coral hover:text-white"
-              >
-                Cancel Booking
-              </Button>
-            </>
-          )}
+          <Button
+            onClick={() => onEdit(booking)}
+            variant="outline"
+            className="flex-1"
+          >
+            Edit
+          </Button>
           <Button
             onClick={() => onDelete(booking)}
             variant="destructive"

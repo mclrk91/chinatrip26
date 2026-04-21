@@ -19,12 +19,10 @@ export function BottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50"
       style={{
-        background: "rgba(245, 240, 235, 0.95)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        borderTop: "1px solid var(--paper-400)",
+        background: "#C41E3A",
+        boxShadow: "0 -6px 20px rgba(196, 30, 58, 0.22)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        minHeight: 80,
+        minHeight: 96,
       }}
     >
       <div className="flex items-center justify-around max-w-lg mx-auto">
@@ -40,23 +38,38 @@ export function BottomNav() {
               href={item.href}
               className="flex flex-col items-center justify-center transition-colors"
               style={{
-                padding: "10px 16px",
+                padding: "14px 16px 10px",
                 minWidth: 88,
-                minHeight: 64,
-                color: isActive ? "#C41E3A" : "var(--ink-500)",
+                minHeight: 76,
+                color: "#ffffff",
+                opacity: isActive ? 1 : 0.78,
+                position: "relative",
               }}
             >
-              <Icon style={{ width: 24, height: 24 }} />
+              <Icon style={{ width: 26, height: 26 }} />
               <span
                 style={{
                   fontSize: 12,
-                  marginTop: 4,
-                  fontWeight: 600,
-                  letterSpacing: "0.02em",
+                  marginTop: 5,
+                  fontWeight: isActive ? 800 : 600,
+                  letterSpacing: "0.04em",
                 }}
               >
                 {item.label}
               </span>
+              {isActive && (
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    bottom: 6,
+                    width: 22,
+                    height: 3,
+                    borderRadius: 2,
+                    background: "#ffffff",
+                  }}
+                />
+              )}
             </Link>
           );
         })}

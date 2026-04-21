@@ -3,17 +3,33 @@
 import { useMemo, useState } from "react";
 import { format, addDays, isSameDay, parseISO } from "date-fns";
 import { BookingCard } from "./booking-card";
+import { DayNotes } from "./day-notes";
 import { ItineraryTopBar } from "./itinerary-top-bar";
 import { CITIES_BY_DATE, FLAGS_BY_DATE, TRIP_START, TRIP_DAYS } from "@/lib/constants";
-import type { Booking } from "@/lib/supabase/types";
+import type { Booking, DayNote } from "@/lib/supabase/types";
 
 interface ItineraryTimelineProps {
   bookings: Booking[];
+  dayNotes: DayNote[];
   onBookingClick: (booking: Booking) => void;
+  onDayNotesChange: () => void;
 }
 
-export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelineProps) {
+export function ItineraryTimeline({
+  bookings,
+  dayNotes,
+  onBookingClick,
+  onDayNotesChange,
+}: ItineraryTimelineProps) {
   const [query, setQuery] = useState("");
+
+  const notesByDate = useMemo(() => {
+    const map: Record<string, DayNote[]> = {};
+    for (const n of dayNotes) {
+      (map[n.date] ||= []).push(n);
+    }
+    return map;
+  }, [dayNotes]);
 
   const days = useMemo(() => {
     const result = [] as {
@@ -21,6 +37,7 @@ export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelin
       dateStr: string;
       dayNumber: number;
       bookings: Booking[];
+      notes: DayNote[];
       city: string;
       flag: string;
     }[];
@@ -43,12 +60,13 @@ export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelin
         dateStr,
         dayNumber: i + 1,
         bookings: dayBookings,
+        notes: notesByDate[dateStr] || [],
         city: CITIES_BY_DATE[dateStr] || "",
         flag: FLAGS_BY_DATE[dateStr] || "",
       });
     }
     return result;
-  }, [bookings]);
+  }, [bookings, notesByDate]);
 
   const q = query.trim().toLowerCase();
   const matches = (b: Booking) => {
@@ -78,7 +96,7 @@ export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelin
   };
 
   return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 0 120px" }}>
+    <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 0 140px" }}>
       <div style={{ padding: "28px 20px 0" }}>
         <ItineraryTopBar
           query={query}
@@ -258,6 +276,12 @@ export function ItineraryTimeline({ bookings, onBookingClick }: ItineraryTimelin
                     ))}
                   </div>
                 )}
+
+                <DayNotes
+                  date={day.dateStr}
+                  notes={day.notes}
+                  onChange={onDayNotesChange}
+                />
               </div>
             </section>
           );
