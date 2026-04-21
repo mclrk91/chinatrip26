@@ -207,6 +207,22 @@ export function BookingForm({
         </div>
       </div>
 
+      {/* Timezone */}
+      <div className="space-y-2">
+        <Label htmlFor="timezone">Time Zone (as listed on the reservation)</Label>
+        <Input
+          id="timezone"
+          value={(formData.details.timezone as string) || ""}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              details: { ...prev.details, timezone: e.target.value },
+            }))
+          }
+          placeholder="e.g., EDT, ICT, HKT, China Time"
+        />
+      </div>
+
       {/* Payment Method */}
       <div className="space-y-2">
         <Label htmlFor="payment_method">Payment Method</Label>

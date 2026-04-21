@@ -89,9 +89,9 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
 
   const subtitle = (() => {
     if (booking.type === "flight" && details?.departure_airport && details?.arrival_airport) {
-      return `${details.departure_airport} → ${details.arrival_airport}${
-        details.flight_number ? ` · ${details.flight_number}` : ""
-      }`;
+      const airline = booking.provider ? `${booking.provider} · ` : "";
+      const flight = details.flight_number ? ` · ${details.flight_number}` : "";
+      return `${airline}${details.departure_airport} → ${details.arrival_airport}${flight}`;
     }
     if (booking.type === "hotel" && details?.city) {
       const nights = details?.nights ? ` · ${details.nights} night${details.nights === "1" ? "" : "s"}` : "";
@@ -208,19 +208,24 @@ export function BookingCard({ booking, onClick }: BookingCardProps) {
           {startTime && (
             <span
               className="inline-flex items-center whitespace-nowrap"
-              style={{ gap: 4, fontSize: 12, color: "var(--muted-foreground)" }}
+              style={{ gap: 6, fontSize: 12, color: "var(--muted-foreground)" }}
             >
               <Clock style={{ width: 13, height: 13 }} />
-              {startTime}
-              {endTime ? ` – ${endTime}` : ""}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                {startTime}
+                {endTime ? ` – ${endTime}` : ""}
+              </span>
               {tz && (
                 <span
                   style={{
-                    marginLeft: 4,
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: "0.06em",
-                    color: "var(--brown-300, #8C7B6A)",
+                    color: "#6B3410",
+                    background: "#F3E7D3",
+                    padding: "2px 6px",
+                    borderRadius: 999,
+                    textTransform: "uppercase",
                   }}
                 >
                   {tz}

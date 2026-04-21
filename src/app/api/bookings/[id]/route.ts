@@ -69,13 +69,10 @@ export async function DELETE(
   try {
     const supabase = getServiceClient();
 
-    // Soft delete: mark as cancelled
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("bookings")
-      .update({ status: "cancelled" })
-      .eq("id", params.id)
-      .select()
-      .single();
+      .delete()
+      .eq("id", params.id);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -88,7 +85,7 @@ export async function DELETE(
       console.error("Google Sheets sync error:", syncErr);
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to delete booking" },

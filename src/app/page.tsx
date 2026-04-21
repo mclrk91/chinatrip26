@@ -7,11 +7,12 @@ import { BookingDetail } from "@/components/booking-detail";
 import { EditBookingDialog } from "@/components/edit-booking-dialog";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 import { BottomNav } from "@/components/bottom-nav";
-import type { Booking } from "@/lib/supabase/types";
+import type { Booking, DayNote } from "@/lib/supabase/types";
 import type { BookingFormData } from "@/components/booking-form";
 
 export default function HomePage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [dayNotes, setDayNotes] = useState<DayNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -40,9 +41,22 @@ export default function HomePage() {
     }
   }, []);
 
+  const fetchDayNotes = useCallback(async () => {
+    try {
+      const res = await fetch("/api/day-notes");
+      if (res.ok) {
+        const data = await res.json();
+        setDayNotes(Array.isArray(data) ? data : []);
+      }
+    } catch {
+      // Non-fatal; notes just won't render.
+    }
+  }, []);
+
   useEffect(() => {
     fetchBookings();
-  }, [fetchBookings]);
+    fetchDayNotes();
+  }, [fetchBookings, fetchDayNotes]);
 
   const handleBookingClick = (booking: Booking) => {
     setSelectedBooking(booking);
@@ -79,23 +93,6 @@ export default function HomePage() {
     }
   };
 
-  const handleCancel = async (booking: Booking) => {
-    setDetailOpen(false);
-    try {
-      const res = await fetch(`/api/bookings/${booking.id}/cancel`, {
-        method: "POST",
-      });
-      if (res.ok) {
-        toast.success("Booking cancelled.");
-        fetchBookings();
-      } else {
-        throw new Error("Failed to cancel");
-      }
-    } catch {
-      toast.error("Failed to cancel booking. Please try again.");
-    }
-  };
-
   const handleDeleteClick = (booking: Booking) => {
     setDetailOpen(false);
     setDeleteBooking(booking);
@@ -125,7 +122,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-32">
       {/* Content */}
       <main>
         {loading ? (
@@ -173,7 +170,9 @@ export default function HomePage() {
         ) : (
           <ItineraryTimeline
             bookings={bookings}
+            dayNotes={dayNotes}
             onBookingClick={handleBookingClick}
+            onDayNotesChange={fetchDayNotes}
           />
         )}
       </main>
@@ -187,7 +186,6 @@ export default function HomePage() {
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
         onEdit={handleEdit}
-        onCancel={handleCancel}
         onDelete={handleDeleteClick}
       />
 
