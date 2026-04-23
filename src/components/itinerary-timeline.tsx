@@ -5,7 +5,7 @@ import { format, addDays, isSameDay, parseISO } from "date-fns";
 import { BookingCard } from "./booking-card";
 import { DayNotes } from "./day-notes";
 import { ItineraryTopBar } from "./itinerary-top-bar";
-import { TRIP_START, TRIP_DAYS } from "@/lib/constants";
+import { TRIP_START, TRIP_DAYS, type BookingType } from "@/lib/constants";
 import { useTripDays } from "@/lib/use-trip-days";
 import type { Booking, DayNote } from "@/lib/supabase/types";
 
@@ -23,7 +23,36 @@ export function ItineraryTimeline({
   onDayNotesChange,
 }: ItineraryTimelineProps) {
   const [query, setQuery] = useState("");
+  const [selectedTravelers, setSelectedTravelers] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [selectedTypes, setSelectedTypes] = useState<Set<BookingType>>(
+    () => new Set()
+  );
   const { cities, flags } = useTripDays();
+
+  const toggleTraveler = (name: string) => {
+    setSelectedTravelers((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+
+  const toggleType = (type: BookingType) => {
+    setSelectedTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  };
+
+  const clearFilters = () => {
+    setSelectedTravelers(new Set());
+    setSelectedTypes(new Set());
+  };
 
   const notesByDate = useMemo(() => {
     const map: Record<string, DayNote[]> = {};
@@ -71,7 +100,14 @@ export function ItineraryTimeline({
   }, [bookings, notesByDate, cities, flags]);
 
   const q = query.trim().toLowerCase();
+  const filtersActive =
+    !!q || selectedTravelers.size > 0 || selectedTypes.size > 0;
   const matches = (b: Booking) => {
+    if (selectedTypes.size > 0 && !selectedTypes.has(b.type)) return false;
+    if (selectedTravelers.size > 0) {
+      const overlap = (b.travelers || []).some((t) => selectedTravelers.has(t));
+      if (!overlap) return false;
+    }
     if (!q) return true;
     const details = b.details as Record<string, string>;
     return [
@@ -90,7 +126,9 @@ export function ItineraryTimeline({
     ...d,
     bookings: d.bookings.filter(matches),
   }));
-  const shown = q ? displayedDays.filter((d) => d.bookings.length > 0) : displayedDays;
+  const shown = filtersActive
+    ? displayedDays.filter((d) => d.bookings.length > 0)
+    : displayedDays;
 
   const scrollToDay = (dateStr: string) => {
     const el = document.querySelector(`[data-day-key="${dateStr}"]`);
@@ -111,6 +149,11 @@ export function ItineraryTimeline({
           }))}
           onJumpTo={scrollToDay}
           bookings={bookings}
+          selectedTravelers={selectedTravelers}
+          selectedTypes={selectedTypes}
+          onToggleTraveler={toggleTraveler}
+          onToggleType={toggleType}
+          onClearFilters={clearFilters}
         />
       </div>
 
@@ -142,7 +185,7 @@ export function ItineraryTimeline({
         </p>
       </header>
 
-      {q && shown.length === 0 && (
+      {filtersActive && shown.length === 0 && (
         <p
           style={{
             padding: "24px 20px",
@@ -151,7 +194,13 @@ export function ItineraryTimeline({
             textAlign: "center",
           }}
         >
-          No bookings match &ldquo;<b>{query}</b>&rdquo;
+          {q ? (
+            <>
+              No bookings match &ldquo;<b>{query}</b>&rdquo;
+            </>
+          ) : (
+            <>No bookings match the current filters</>
+          )}
         </p>
       )}
 

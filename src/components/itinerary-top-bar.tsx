@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
-import { Search, Calendar, Sparkles, X } from "lucide-react";
+import { Search, Calendar, Sparkles, X, SlidersHorizontal } from "lucide-react";
 import { AskAISheet } from "./ask-ai-sheet";
+import { ItineraryFilterPanel } from "./itinerary-filter-panel";
+import type { BookingType } from "@/lib/constants";
 import type { Booking } from "@/lib/supabase/types";
 
 interface DayOption {
@@ -19,6 +21,11 @@ interface ItineraryTopBarProps {
   days: DayOption[];
   onJumpTo: (dateStr: string) => void;
   bookings: Booking[];
+  selectedTravelers: Set<string>;
+  selectedTypes: Set<BookingType>;
+  onToggleTraveler: (name: string) => void;
+  onToggleType: (type: BookingType) => void;
+  onClearFilters: () => void;
 }
 
 export function ItineraryTopBar({
@@ -27,21 +34,29 @@ export function ItineraryTopBar({
   days,
   onJumpTo,
   bookings,
+  selectedTravelers,
+  selectedTypes,
+  onToggleTraveler,
+  onToggleType,
+  onClearFilters,
 }: ItineraryTopBarProps) {
   const [jumpOpen, setJumpOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const filterCount = selectedTravelers.size + selectedTypes.size;
 
   useEffect(() => {
-    if (!jumpOpen) return;
+    if (!jumpOpen && !filterOpen) return;
     const onClick = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setJumpOpen(false);
+        setFilterOpen(false);
       }
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
-  }, [jumpOpen]);
+  }, [jumpOpen, filterOpen]);
 
   const handleJump = (dateStr: string) => {
     setJumpOpen(false);
@@ -105,7 +120,10 @@ export function ItineraryTopBar({
 
         <button
           type="button"
-          onClick={() => setJumpOpen((v) => !v)}
+          onClick={() => {
+            setJumpOpen((v) => !v);
+            setFilterOpen(false);
+          }}
           aria-label="Jump to date"
           style={{
             width: 44,
@@ -122,6 +140,55 @@ export function ItineraryTopBar({
           }}
         >
           <Calendar style={{ width: 18, height: 18 }} />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setFilterOpen((v) => !v);
+            setJumpOpen(false);
+          }}
+          aria-label="Filter bookings"
+          style={{
+            position: "relative",
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            background: filterCount > 0 ? "#6B3410" : "#ffffff",
+            border: "none",
+            cursor: "pointer",
+            color: filterCount > 0 ? "#F5E9C8" : "#2B1810",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 1px 2px rgba(26,26,46,.05)",
+          }}
+        >
+          <SlidersHorizontal style={{ width: 18, height: 18 }} />
+          {filterCount > 0 && (
+            <span
+              aria-hidden
+              style={{
+                position: "absolute",
+                top: 4,
+                right: 4,
+                minWidth: 16,
+                height: 16,
+                padding: "0 4px",
+                borderRadius: 999,
+                background: "#C41E3A",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                lineHeight: 1,
+              }}
+            >
+              {filterCount}
+            </span>
+          )}
         </button>
 
         {jumpOpen && (
@@ -188,6 +255,17 @@ export function ItineraryTopBar({
               );
             })}
           </div>
+        )}
+
+        {filterOpen && (
+          <ItineraryFilterPanel
+            selectedTravelers={selectedTravelers}
+            selectedTypes={selectedTypes}
+            onToggleTraveler={onToggleTraveler}
+            onToggleType={onToggleType}
+            onClear={onClearFilters}
+            onClose={() => setFilterOpen(false)}
+          />
         )}
       </div>
 
