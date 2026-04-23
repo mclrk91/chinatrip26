@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -13,7 +13,6 @@ const CATEGORY_ORDER: LoyaltyCategory[] = [
   "airline",
   "hotel",
   "known_traveler",
-  "credit_card",
   "other",
 ];
 
@@ -45,6 +44,14 @@ function LoyaltyRow({ row, onChange }: RowProps) {
   const [program, setProgram] = useState(row.program_name);
   const [revealed, setRevealed] = useState(false);
   const [saving, setSaving] = useState(false);
+  const programRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = programRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [program]);
 
   const save = async (patch: Partial<LoyaltyNumber>) => {
     setSaving(true);
@@ -99,10 +106,9 @@ function LoyaltyRow({ row, onChange }: RowProps) {
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.2fr auto auto",
+        display: "flex",
+        flexDirection: "column",
         gap: 8,
-        alignItems: "center",
         padding: "10px 12px",
         background: "#fff",
         borderRadius: 10,
@@ -110,80 +116,112 @@ function LoyaltyRow({ row, onChange }: RowProps) {
         opacity: saving ? 0.65 : 1,
       }}
     >
-      <input
-        type="text"
-        value={program}
-        onChange={(e) => setProgram(e.target.value)}
-        onBlur={handleProgramBlur}
+      <div
         style={{
-          border: "none",
-          outline: "none",
-          background: "transparent",
-          fontSize: 14,
-          fontWeight: 600,
-          color: "#2B1810",
-          fontFamily: "inherit",
-          minWidth: 0,
-        }}
-      />
-      <input
-        type="text"
-        value={revealed ? number : display}
-        onChange={(e) => {
-          setNumber(e.target.value);
-          if (!revealed) setRevealed(true);
-        }}
-        onBlur={handleNumberBlur}
-        placeholder="Add number"
-        style={{
-          border: "1px dashed #D9CFC2",
-          background: "#FBF6EC",
-          borderRadius: 6,
-          padding: "6px 8px",
-          fontSize: 14,
-          color: "#2B1810",
-          outline: "none",
-          fontFamily: "inherit",
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: revealed || !hasNumber ? "normal" : "0.05em",
-          minWidth: 0,
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => setRevealed((v) => !v)}
-        aria-label={revealed ? "Hide number" : "Reveal number"}
-        disabled={!hasNumber}
-        style={{
-          border: "none",
-          background: "transparent",
-          cursor: hasNumber ? "pointer" : "default",
-          color: hasNumber ? "#6B3410" : "#D9CFC2",
-          padding: 6,
-          display: "inline-flex",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 8,
         }}
       >
-        {revealed ? (
-          <EyeOff style={{ width: 16, height: 16 }} />
-        ) : (
-          <Eye style={{ width: 16, height: 16 }} />
-        )}
-      </button>
-      <button
-        type="button"
-        onClick={handleDelete}
-        aria-label="Delete row"
+        <textarea
+          ref={programRef}
+          value={program}
+          onChange={(e) => setProgram(e.target.value.replace(/\n/g, ""))}
+          onBlur={handleProgramBlur}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              programRef.current?.blur();
+            }
+          }}
+          rows={1}
+          style={{
+            flex: 1,
+            border: "none",
+            outline: "none",
+            background: "transparent",
+            fontSize: 14,
+            fontWeight: 600,
+            color: "#2B1810",
+            fontFamily: "inherit",
+            lineHeight: 1.3,
+            resize: "none",
+            overflow: "hidden",
+            padding: 0,
+            minWidth: 0,
+            wordBreak: "break-word",
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleDelete}
+          aria-label="Delete row"
+          style={{
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            color: "#C41E3A",
+            padding: 2,
+            display: "inline-flex",
+            flex: "0 0 auto",
+          }}
+        >
+          <Trash2 style={{ width: 16, height: 16 }} />
+        </button>
+      </div>
+      <div
         style={{
-          border: "none",
-          background: "transparent",
-          cursor: "pointer",
-          color: "#C41E3A",
-          padding: 6,
-          display: "inline-flex",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
         }}
       >
-        <Trash2 style={{ width: 16, height: 16 }} />
-      </button>
+        <input
+          type="text"
+          value={revealed ? number : display}
+          onChange={(e) => {
+            setNumber(e.target.value);
+            if (!revealed) setRevealed(true);
+          }}
+          onBlur={handleNumberBlur}
+          placeholder="Add number"
+          style={{
+            flex: 1,
+            border: "1px dashed #D9CFC2",
+            background: "#FBF6EC",
+            borderRadius: 6,
+            padding: "6px 8px",
+            fontSize: 14,
+            color: "#2B1810",
+            outline: "none",
+            fontFamily: "inherit",
+            fontVariantNumeric: "tabular-nums",
+            letterSpacing: revealed || !hasNumber ? "normal" : "0.05em",
+            minWidth: 0,
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => setRevealed((v) => !v)}
+          aria-label={revealed ? "Hide number" : "Reveal number"}
+          disabled={!hasNumber}
+          style={{
+            border: "none",
+            background: "transparent",
+            cursor: hasNumber ? "pointer" : "default",
+            color: hasNumber ? "#6B3410" : "#D9CFC2",
+            padding: 6,
+            display: "inline-flex",
+            flex: "0 0 auto",
+          }}
+        >
+          {revealed ? (
+            <EyeOff style={{ width: 16, height: 16 }} />
+          ) : (
+            <Eye style={{ width: 16, height: 16 }} />
+          )}
+        </button>
+      </div>
     </div>
   );
 }
