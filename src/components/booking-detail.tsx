@@ -1,8 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { format } from "date-fns";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +13,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { BOOKING_TYPE_COLORS, BOOKING_TYPE_LABELS } from "@/lib/constants";
+import { HotelTranslateCard } from "@/components/hotel-translate-card";
 import type { Booking } from "@/lib/supabase/types";
 
 function confirmationLinkFor(booking: Booking): string | null {
@@ -57,6 +58,8 @@ export function BookingDetail({
   onEdit,
   onDelete,
 }: BookingDetailProps) {
+  const [translateOpen, setTranslateOpen] = useState(false);
+
   if (!booking) return null;
 
   const color = BOOKING_TYPE_COLORS[booking.type] || "#6B7280";
@@ -64,6 +67,8 @@ export function BookingDetail({
   const cost = booking.cost as Record<string, unknown>;
   const isCancelled = booking.status === "cancelled";
   const showStatusBadge = booking.status !== "confirmed";
+  const canTranslate =
+    booking.type === "hotel" && Boolean(details?.address);
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -203,6 +208,35 @@ export function BookingDetail({
           })()}
         </div>
 
+        {canTranslate && (
+          <button
+            type="button"
+            onClick={() => setTranslateOpen(true)}
+            style={{
+              marginTop: 16,
+              width: "100%",
+              height: 48,
+              borderRadius: 12,
+              background: "linear-gradient(135deg, #6B3410 0%, #8B4513 100%)",
+              color: "#F5E9C8",
+              border: "none",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              fontFamily: "var(--font-body)",
+              fontSize: 15,
+              fontWeight: 600,
+              letterSpacing: "0.02em",
+              boxShadow: "0 2px 8px rgba(43,27,77,.18)",
+            }}
+          >
+            <Languages style={{ width: 18, height: 18 }} />
+            Show to a local
+          </button>
+        )}
+
         {/* Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t">
           <Button
@@ -220,6 +254,14 @@ export function BookingDetail({
             Delete
           </Button>
         </div>
+
+        {canTranslate && (
+          <HotelTranslateCard
+            booking={booking}
+            open={translateOpen}
+            onClose={() => setTranslateOpen(false)}
+          />
+        )}
       </SheetContent>
     </Sheet>
   );

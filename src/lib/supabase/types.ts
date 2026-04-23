@@ -33,3 +33,21 @@ export interface DayNote {
   created_at: string;
   updated_at: string;
 }
+
+export type LoyaltyCategory =
+  | "airline"
+  | "hotel"
+  | "known_traveler"
+  | "credit_card"
+  | "other";
+
+export interface LoyaltyNumber {
+  id: string;
+  traveler_name: string;
+  category: LoyaltyCategory;
+  program_name: string;
+  number: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}

@@ -26,7 +26,9 @@ Return JSON with these fields:
     "check_in": "if hotel",
     "check_out": "if hotel",
     "city": "city name",
-    "address": "if available"
+    "address": "if available",
+    "phone": "hotel phone if available",
+    "website": "official hotel website URL if hotel and present"
   },
   "cost": {"amount": number, "currency": "USD", "points_used": false} or {},
   "payment_method": "Credit card type or points program or null",
@@ -40,6 +42,7 @@ Important:
 - Match traveler names exactly from the list: ${TRAVELERS_LIST}
 - Use ISO 8601 format with timezone offsets for dates
 - If information is not present, use null or empty values
+- For hotel bookings, include the official hotel website URL in details.website when visible (not the booking platform URL — that goes in booking_url)
 - Extract ALL text from the document for the extracted_text field`;
 
 export async function extractBookingData(

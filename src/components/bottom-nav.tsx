@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, PlusCircle, Settings } from "lucide-react";
+import { CalendarDays, PlusCircle, Settings, BadgeCheck } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Itinerary", icon: CalendarDays },
   { href: "/upload", label: "Add Booking", icon: PlusCircle },
+  { href: "/loyalty", label: "Numbers", icon: BadgeCheck },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
