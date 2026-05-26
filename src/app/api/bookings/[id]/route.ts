@@ -33,11 +33,15 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
+    // Coerce "" -> null so timestamptz / nullable columns don't reject the write.
+    const clean = Object.fromEntries(
+      Object.entries(body).map(([k, v]) => [k, v === "" ? null : v])
+    );
     const supabase = getServiceClient();
 
     const { data, error } = await supabase
       .from("bookings")
-      .update(body)
+      .update(clean)
       .eq("id", params.id)
       .select()
       .single();

@@ -21,8 +21,8 @@ export interface BookingFormData {
   confirmation_code: string;
   alt_codes: Record<string, string>;
   travelers: string[];
-  date_start: string;
-  date_end: string;
+  date_start: string | null;
+  date_end: string | null;
   details: Record<string, unknown>;
   cost: Record<string, unknown>;
   payment_method: string;
@@ -89,10 +89,10 @@ export function BookingForm({
       ...formData,
       date_start: formData.date_start
         ? new Date(formData.date_start).toISOString()
-        : "",
+        : null,
       date_end: formData.date_end
         ? new Date(formData.date_end).toISOString()
-        : "",
+        : null,
     };
     await onSubmit(submitData);
   };
@@ -188,7 +188,7 @@ export function BookingForm({
           <Input
             id="date_start"
             type="datetime-local"
-            value={formData.date_start}
+            value={formData.date_start ?? ""}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, date_start: e.target.value }))
             }
@@ -199,7 +199,7 @@ export function BookingForm({
           <Input
             id="date_end"
             type="datetime-local"
-            value={formData.date_end}
+            value={formData.date_end ?? ""}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, date_end: e.target.value }))
             }

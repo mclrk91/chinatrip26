@@ -27,12 +27,16 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    // Coerce "" -> null so timestamptz / nullable columns don't reject the write.
+    const clean = Object.fromEntries(
+      Object.entries(body).map(([k, v]) => [k, v === "" ? null : v])
+    );
     const supabase = getServiceClient();
 
     // Insert into Supabase
     const { data, error } = await supabase
       .from("bookings")
-      .insert(body)
+      .insert(clean)
       .select()
       .single();
 
